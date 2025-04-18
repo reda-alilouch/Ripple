@@ -1,0 +1,9 @@
+.icon-bx i {
+  font-family: boxicons !important;
+  font-style: normal;
+}
+
+.icon-fa i {
+  font-family: "Font Awesome 6 Free" !important;
+  font-weight: 900; /* Pour solid par exemple */
+}

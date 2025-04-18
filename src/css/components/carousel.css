@@ -1,0 +1,37 @@
+.bx-chevron-left {
+  left: 0;
+}
+.bx-chevron-right {
+  right: 0;
+}
+#left {
+  font-size: 4rem;
+}
+#right {
+  font-size: 4rem;
+}
+.section {
+  margin: auto;
+}
+.img-grand {
+  width: 100%;
+}
+.div1 {
+  position: relative;
+}
+.ul-carosel {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  gap: 12px;
+  align-items: center;
+}
+.img {
+  width: 20px;
+  height: 20px;
+  border-radius: 90px;
+  background-color: gray;
+}
+
