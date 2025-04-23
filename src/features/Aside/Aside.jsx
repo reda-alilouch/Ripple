@@ -11,10 +11,10 @@ const AsidesArray = [
 ];
 
 const displayAsides = AsidesArray.map((item) => (
-  <div className="mb-2 sm:text-base md:text-lg md:mb-4 xl:text-xl">
+  <div className="mb-2 sm:text-base md:text-lg md:mb-4 xl:text-xl xl:mb-6" >
     <a href="#">
-      <Icon lib={`${item.lib}`} name={`${item.icon}`} className="mr-2" />
-      <span>{item.namepage}</span>
+      <Icon lib={`${item.lib}`} name={`${item.icon}`} className="mr-2 xl:mr-6" />
+      <span className="nompage" >{item.namepage}</span>
     </a>
   </div>
 ));

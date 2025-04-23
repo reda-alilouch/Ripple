@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <Header onToggleSidebar={toggleSidebar} />
-        <div className="flex">
+        <div className="xl:flex">
           <Aside isOpen={isSidebarOpen} />
           <main className="main" id="main">
             {children}
