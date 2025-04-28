@@ -1,8 +1,4 @@
+
 .audio {
   background-color: #fff;
-}
-@media (max-width: 639px) {
-  .bx-skip-previous .bx-skip-next {
-    display: none !important;
-  }
 }

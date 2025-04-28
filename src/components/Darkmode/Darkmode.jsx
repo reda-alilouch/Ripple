@@ -1,17 +1,19 @@
 "use client";
-
-import styles from "@/components/Darkmode/Darkmode.module.css";
-
+import styles from "@/components/Darkmode/Darkmode.css";
 
 const Darkmode = () => {
   return (
-    <div className={styles.mode}>
-    <input type="checkbox" id="darkmode-toggle" className={styles.checkbox} />
-    <label htmlFor="darkmode-toggle" className={styles["checkbox-label"]}>
-      <span className={styles.ball}></span>
-    </label>
-  </div>
+    <div className="mode" id="darkModeToggle">
+      <input type="checkbox" className="checkbox btn" id="checkbox" />
+      <label
+        for="checkbox"
+        className="checkbox-label border btn w-20 h-8 xl:w-24 xl:h-10"
+      >
+        <i className="fa fa-moon"></i>
+        <i className="fa fa-sun"></i>
+        <span className="ball"></span>
+      </label>
+    </div>
   );
 };
 export default Darkmode;
-

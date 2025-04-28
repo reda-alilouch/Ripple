@@ -25,6 +25,10 @@
     justify-content: space-between;
     align-items: center;
   }
+  .btn {
+    border-radius: 30px;
+    
+  }
   @media (min-width: 1280px) {
     .checkbox-label .ball {
       bottom: 10px;

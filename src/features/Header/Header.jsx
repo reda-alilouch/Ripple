@@ -46,47 +46,49 @@ const Header = ({ onToggleSidebar }) => (
       </div>
 
       <div
-        className={`btn-group py-1 btnmobile justify-end xl:flex xl:justify-end xl:items-center ${styles["btn-group"]}`}
+        className={` ${styles["btn-group"]} btn-group py-1 btnmobile justify-end xl:flex xl:justify-end xl:items-center`}
         id="btn-group"
       >
-        <div className="flex justify-end gap-2">
-          <Darkmode />
-          <div>
-            <div className="relative">
-              <Button
-                id="dropdown"
-                name="Français"
-                className="border rounded-3xl w-20 h-8 text-center text-xs xl:w-32 xl:h-10"
-                onClick={traduireonclick}
-              />
-              <i
-                className={` ${styles["bx-globe"]} bx bx-globe absolute left-1 hidden`}
-              ></i>
-              <i
-                className={`bx bx-chevron-down absolute right-1 hidden ${styles["bx-chevron-down"]}`}
-              ></i>
-            </div>
-            <div
-              className={`${styles.lang} border mt-3 py-2 w-20 xl:w-32`}
-              id="lang"
-            >
-              <ul>
-                <li className="text-xs mb-1">Français</li>
-                <li className="text-xs mt-1">English</li>
-              </ul>
-            </div>
+        <Darkmode />
+        <div>
+          <div className="relative">
+            <Button
+              id="dropdown"
+              name="Français"
+              className="border rounded-3xl w-20 h-8 text-center text-xs xl:w-32 xl:h-10 xl:text-base"
+              onClick={traduireonclick}
+            />
+            <Icon
+              lib="bx"
+              name="bx-globe"
+              className="absolute left-2 top-3 !hidden xl:text-base xl:!block"
+            />
+            <Icon
+              lib="bx"
+              name="bx-chevron-down"
+              className="absolute right-2 top-3 !hidden xl:text-base xl:!block"
+            />
           </div>
+          <div
+            className={`${styles.lang} border mt-3 py-2 w-20 xl:w-32`}
+            id="lang"
+          >
+            <ul>
+              <li className="text-xs mb-1">Français</li>
+              <li className="text-xs mt-1">English</li>
+            </ul>
+          </div>
+        </div>
 
-          <div>
-            <a href="#">
-              <Button
-                id="btn-connexion"
-                name="Connexion"
-                className="border rounded-3xl w-20 h-8 text-center text-xs xl:w-32 xl:h-10"
-                onClick={handleConnexion}
-              />
-            </a>
-          </div>
+        <div>
+          <a href="#">
+            <Button
+              id="btn-connexion"
+              name="Connexion"
+              className="border rounded-3xl w-20 h-8 text-center text-xs xl:w-32 xl:h-10 xl:text-base"
+              onClick={handleConnexion}
+            />
+          </a>
         </div>
       </div>
     </nav>

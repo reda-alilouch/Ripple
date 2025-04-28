@@ -27,14 +27,6 @@
   display: flex;
 }
 
-.header .bx-globe {
-  top: 8px;
-}
-
-.header .bx-chevron-down {
-  top: 8px;
-}
-
 .header .lang {
   display: none;
 }
