@@ -11,22 +11,26 @@ const AsidesArray = [
 ];
 
 const displayAsides = AsidesArray.map((item) => (
-  <div className="mb-2 sm:text-base md:text-lg md:mb-4 xl:text-xl xl:mb-6" >
+  <li className="mb-2 sm:text-base md:text-lg md:mb-4 xl:text-xl xl:mb-6">
     <a href="#">
-      <Icon lib={`${item.lib}`} name={`${item.icon}`} className="mr-2 xl:mr-6" />
-      <span className="nompage" >{item.namepage}</span>
+      <Icon
+        lib={`${item.lib}`}
+        name={`${item.icon}`}
+        className="mr-2 xl:mr-6"
+      />
+      <span className="nompage xl:hidden">{item.namepage}</span>
     </a>
-  </div>
+  </li>
 ));
 
 const Aside = ({ isOpen }) => {
   return (
     <aside
-      className={`${styles.aside} aside xl:flex xl:w-1/4 `}
+      className={`${styles.aside} aside hidden xl:flex xl:w-1/20 `}
       id="aside"
     >
-      <div className="p-4 flex items-center xl:w-full xl:fixed xl:left-0">
-        <div className="aside-nav xl:w-full">{displayAsides}</div>
+      <div className="xl:fixed xl:left-0 xl:top-16">
+        <ul className="aside-nav ">{displayAsides}</ul>
       </div>
     </aside>
   );
