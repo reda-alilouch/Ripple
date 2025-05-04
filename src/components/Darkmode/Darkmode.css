@@ -4,14 +4,14 @@
     width: 20px;
     height: 20px;
     position: absolute;
-    left: 2px;
+    left: 8px;
     bottom: 5px;
     border-radius: 50%;
     transition: transform 0.2s linear;
     margin-top: 8px;
   }
   .checkbox:checked + .checkbox-label .ball {
-    transform: translateX(54px);
+    transform: translateX(42px);
   }
   .checkbox {
     opacity: 0;
@@ -19,22 +19,18 @@
   }
   .checkbox-label {
     position: relative;
-    padding: 5px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  .btn {
-    border-radius: 30px;
-    
-  }
+  
   @media (min-width: 1280px) {
     .checkbox-label .ball {
       bottom: 10px;
     }
     .checkbox:checked + .checkbox-label .ball {
-      transform: translateX(69px);
+      transform: translateX(58px);
     }
   }
 }

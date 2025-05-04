@@ -1,20 +1,18 @@
-.aside {
-  display: none;
 
-  .p-4 {
+@media (max-width: 1279px) {
+  .aside {
     height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
   }
-  .aside-nav {
-    width: 34%;
+  .aside div {
+    height: 100%;
+    display: flex;
+    align-items: start;
+  }
+  .aside div ul {
     margin: auto;
+    width: 104;
   }
-}
-.aside.active {
-  position: absolute;
-  display: block;
-  height: 100%;
-  width: 100%;
-  background: silver;
-  top: 0;
-  z-index: 2;
 }
