@@ -11,7 +11,11 @@
   "dependencies": {
     "@splidejs/splide": "^4.1.4",
     "boxicons": "^2.1.4",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.14.2",
     "next": "15.3.0",
+    "node-fetch": "^3.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

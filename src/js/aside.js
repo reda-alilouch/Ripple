@@ -17,7 +17,7 @@ export const menuonclick = (query) => {
     toggleButton.classList.toggle("bx-menu");
     toggleButton.classList.toggle("bx-x");
     for (let i = 0; i < nompage.length; i++) {
-      nompage[i].classList.toggle("hidden");
+      nompage[i].classList.toggle("xl:hidden");
     }
     aside.classList.toggle("xl:w-2/12");
     aside.classList.toggle("xl:w-1/20");

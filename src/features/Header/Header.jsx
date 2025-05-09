@@ -16,7 +16,7 @@ import React from "react";
 
 const Header = ({ onToggleSidebar }) => (
   <header
-    className={`${styles.header} fixed bg-white shadow right-0 w-full bg-light flex items-center py-3 px-3 gap-4 xl:flex xl:justify-between xl:items-center`}
+    className={`${styles.header} fixed bg-white shadow right-0 w-full z-40 flex items-center py-3 px-3 gap-4 xl:flex xl:justify-between xl:items-center`}
   >
     <div
       className="aside-toggle-container text-primary"

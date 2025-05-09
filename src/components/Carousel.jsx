@@ -12,6 +12,7 @@ function Carousel() {
           <li className="splide__slide">Slide 3</li>
           <li className="splide__slide">Slide 4</li>
           <li className="splide__slide">Slide 5</li>
+          <li className="splide__slide">Slide 6</li>
         </ul>
       </div>
     </div>
