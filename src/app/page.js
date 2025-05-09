@@ -1,19 +1,27 @@
-
-import Splide from '@splidejs/splide';
-import '@splidejs/splide/dist/css/splide.min.css';
+import Carousel from "@/components/Carousel";
+import Titre from "@/components/Card/Titre/Titre";
 
 export default function Home() {
   return (
-    <div className="splide" id="splide">
-      <div className="splide__track">
-        <ul className="splide__list">
-          <li className="splide__slide">Slide 1</li>
-          <li className="splide__slide">Slide 2</li>
-          <li className="splide__slide">Slide 3</li>
-          <li className="splide__slide">Slide 4</li>
-          <li className="splide__slide">Slide 5</li>
-        </ul>
-      </div>
-    </div>
+    <>
+      <Carousel />
+
+      <section className="section container">
+        <div className="head pt-5 px-5">
+          <h2 className="top font-bold">Top titres</h2>
+        </div>
+        <div className="song-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <Titre />
+          <Titre />
+          <Titre />
+          <Titre />
+          <Titre className="hidden md:block"/>
+          <Titre className="hidden md:block"/>
+          <Titre className="hidden md:hidden lg:block"/> 
+          <Titre className="hidden md:hidden lg:block"/>
+          <Titre className="hidden md:hidden lg:block"/>
+        </div>
+      </section>
+    </>
   );
 }

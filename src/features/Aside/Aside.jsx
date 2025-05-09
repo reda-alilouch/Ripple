@@ -29,8 +29,8 @@ const Aside = ({ isOpen }) => {
       className={`${styles.aside} aside hidden xl:flex xl:w-1/20 `}
       id="aside"
     >
-      <div className="xl:fixed xl:left-0 xl:top-16">
-        <ul className="aside-nav ">{displayAsides}</ul>
+      <div className="xl:fixed xl:z-50 xl:left-0 xl:top-16">
+        <ul className="aside-nav">{displayAsides}</ul>
       </div>
     </aside>
   );

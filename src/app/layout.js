@@ -31,8 +31,7 @@ export default function RootLayout({ children }) {
         <div className="xl:flex">
           <Aside isOpen={isSidebarOpen} />
           <main className="main" id="main">
-            {children}
-            <Carousel />
+            {children}           
             <Footer />
           </main>
         </div>

@@ -18,7 +18,7 @@ export default function LangSwitcher() {
       </button>
 
       <div
-        className={`${styles.lang} absolute top-12 left-0 w-28 border bg-white py-2 shadow ${
+        className={`${styles.lang} absolute top-12 left-0 w-20 xl:w-28 border bg-white py-2 shadow ${
           isOpen ? styles.active : ""
         }`}
       >
