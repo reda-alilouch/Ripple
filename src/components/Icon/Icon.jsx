@@ -1,3 +1,5 @@
+'use client';
+
 import styles from "./Icon.module.css";
 
 const Icon = ({ lib = "fa", name = "", className = "", ...props }) => {

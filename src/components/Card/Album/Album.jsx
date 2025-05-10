@@ -1,10 +1,10 @@
 "use client";
-import styles from "./Album.module.css";
+
 import Icon from "@/components/Icon";
 
-const Album = () => {
+const Album = ({ className = "", ...props }) => {
   return (
-    <div className="card-album rounded relative">
+    <div className={`card-album rounded relative ${className}`} {...props}>
       <a href="#">
         <img
           className="album-img rounded w-full h-full opacity-70"
@@ -28,3 +28,4 @@ const Album = () => {
     </div>
   );
 };
+export default Album;

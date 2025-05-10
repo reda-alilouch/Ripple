@@ -4,7 +4,7 @@ import styles from "@/features/Audio/Audio.module.css";
 import Icon from "@/components/Icon";
 const Audio = () => (
   <div
-    className={`${styles.audio} audio bottom-0 left-0 w-full z-20 fixed flex justify-between items-center py-5 px-3 bg-white`}
+    className={`${styles.audio} audio bottom-0 left-0 w-full z-20 fixed flex justify-between items-center py-5 px-3 bg-white transition-colors duration-1000 dark:bg-slate-900 dark:text-white`}
   >
     <div className="nom">
       <h3 className="mb-1">nom titre</h3>

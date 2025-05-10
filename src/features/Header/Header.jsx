@@ -8,6 +8,8 @@ import Connexion from "@/components/Connexion/Connexion";
 
 import styles from "@/features/Header/Header.module.css";
 
+import Image from "next/image";
+
 import { searchonclick } from "@/js/search";
 import { menuonclick } from "@/js/aside";
 import { handleConnexion } from "@/js/conexion";
@@ -16,7 +18,7 @@ import React from "react";
 
 const Header = ({ onToggleSidebar }) => (
   <header
-    className={`${styles.header} fixed bg-white shadow right-0 w-full z-40 flex items-center py-3 px-3 gap-4 xl:flex xl:justify-between xl:items-center`}
+    className={`${styles.header} fixed bg-white shadow right-0 w-full z-40 flex items-center py-3 px-3 gap-4 xl:flex xl:justify-between xl:items-center transition-colors duration-1000 dark:bg-slate-900`}
   >
     <div
       className="aside-toggle-container text-primary"
@@ -26,13 +28,28 @@ const Header = ({ onToggleSidebar }) => (
       <i className=" bx bx-menu aside-toggle text-3xl" id="aside-toggle"></i>
     </div>
     <div className="logo">
-      <img src="" />
+      <Image
+        src="/lightmd.png"
+        alt="ripple logo"
+        width={130}
+        height={38}
+        priority
+        className="block dark:hidden"
+      />
+      <Image
+        src="/darkmd.png"
+        alt="ripple logo"
+        width={130}
+        height={38}
+        priority
+        className="hidden dark:block"
+      />
     </div>
     <nav className="w-full h-10 xl:flex xl:gap-10 xl:items-center">
       <div className="relative w-full xl:w-4/12 h-10 m-auto">
         <form role="search" id="form-search">
           <input
-            className="form-control w-10/12 h-10 border absolute bottom-0 right-0 rounded-3xl px-2 py-3 hidden hover:shadow focus:border-none xl:block  xl:w-full"
+            className="form-control w-10/12 h-10 border absolute bottom-0 right-0 rounded-3xl px-2 py-3 hidden hover:shadow focus:border-none xl:block  xl:w-full transition-colors duration-1000 dark:bg-slate-900 dark:placeholder-white"
             id="bar-search"
             type="search"
             placeholder="Recherche"
