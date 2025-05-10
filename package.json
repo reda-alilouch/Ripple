@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@splidejs/react-splide": "^0.7.12",
     "@splidejs/splide": "^4.1.4",
     "boxicons": "^2.1.4",
     "dotenv": "^16.5.0",

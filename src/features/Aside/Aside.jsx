@@ -3,16 +3,16 @@ import styles from "./Aside.module.css";
 import Icon from "@/components/Icon";
 
 const AsidesArray = [
-  { icon: "bxs-home", lib: "bx", namepage: "Accueil" },
-  { icon: "bxs-category", lib: "bx", namepage: "Genres" },
-  { icon: "bxs-user", lib: "bx", namepage: "Artistes" },
-  { icon: "bxs-album", lib: "bx", namepage: "Albums" },
-  { icon: "bxs-playlist", lib: "bx", namepage: "Playlistes" },
+  { icon: "bxs-home", lib: "bx", namepage: "Accueil", href: "/"  },
+  { icon: "bxs-category", lib: "bx", namepage: "Genres", href: "/genres" },
+  { icon: "bxs-user", lib: "bx", namepage: "Artistes", href: "/artistes" },
+  { icon: "bxs-album", lib: "bx", namepage: "Albums", href: "/albums" },
+  { icon: "bxs-playlist", lib: "bx", namepage: "Playlistes", href: "/playlistes" },
 ];
 
 const displayAsides = AsidesArray.map((item) => (
   <li className="mb-2 sm:text-base md:text-lg md:mb-4 xl:text-xl xl:mb-6">
-    <a href="#">
+    <a href={`${item.href}`}>
       <Icon
         lib={`${item.lib}`}
         name={`${item.icon}`}
@@ -26,11 +26,11 @@ const displayAsides = AsidesArray.map((item) => (
 const Aside = ({ isOpen }) => {
   return (
     <aside
-      className={`${styles.aside} aside hidden xl:flex xl:w-1/20 `}
+      className={`${styles.aside} aside hidden xl:flex xl:w-1/20 transition-colors duration-1000 dark:bg-slate-900 dark:text-white`}
       id="aside"
     >
       <div className="xl:fixed xl:z-50 xl:left-0 xl:top-16">
-        <ul className="aside-nav">{displayAsides}</ul>
+        <ul className="aside-nav p-4">{displayAsides}</ul>
       </div>
     </aside>
   );

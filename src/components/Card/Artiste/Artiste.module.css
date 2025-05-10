@@ -1,0 +1,34 @@
+@media (max-width: 419px) {
+  .artistes .h3-artistes {
+    width: 69px !important;
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+}
+.artistes {
+  text-align: center;
+  .h3-artistes {
+    margin: auto;
+    margin: 0;
+    padding: 0;
+    line-height: 1; /* Évite les espaces inutiles */
+    display: inline-block; /* Ajuste la largeur au texte */
+    white-space: nowrap; /* Empêche les retours à la ligne */
+  }
+}
+
+@media (min-width: 420px) {
+  .artistes {
+    width: 160px !important;
+    height: 180px !important;
+    img {
+      width: 160px !important;
+      height: 160px;
+    }
+    .h3-artistes {
+      width: 92px;
+      font-size: 1rem;
+      line-height: 1.5rem;
+    }
+  }
+}

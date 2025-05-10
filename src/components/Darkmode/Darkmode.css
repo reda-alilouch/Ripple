@@ -30,7 +30,7 @@
       bottom: 10px;
     }
     .checkbox:checked + .checkbox-label .ball {
-      transform: translateX(58px);
+      transform: translateX(56px);
     }
   }
 }
