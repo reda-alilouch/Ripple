@@ -18,10 +18,10 @@ import React from "react";
 
 const Header = ({ onToggleSidebar }) => (
   <header
-    className={`${styles.header} fixed bg-white shadow right-0 w-full z-40 flex items-center py-3 px-3 gap-4 xl:flex xl:justify-between xl:items-center transition-colors duration-1000 dark:bg-slate-900`}
+    className={`${styles.header} fixed shadow right-0 w-full z-40 flex items-center py-3 px-3 gap-4 xl:flex xl:justify-between xl:items-center bg-white transition-colors duration-1000 dark:bg-slate-900`}
   >
     <div
-      className="aside-toggle-container text-primary"
+      className="aside-toggle-container text-primary relative z-50 cursor-pointer"
       onClick={menuonclick}
       id="aside-toggle-container"
     >
@@ -65,7 +65,7 @@ const Header = ({ onToggleSidebar }) => (
         </form>
       </div>
       <div
-        className={` ${styles["btn-group"]} btn-group py-1 btnmobile justify-end hidden xl:!block`}
+        className={` ${styles["btn-group"]} btn-group py-1 btnmobile justify-end hidden xl:!block bg-white transition-colors duration-1000 dark:bg-slate-900`}
         id="btn-group"
       >
         <div className=" flex justify-end xl:items-center gap-3 ">
