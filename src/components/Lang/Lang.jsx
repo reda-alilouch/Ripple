@@ -11,7 +11,7 @@ export default function LangSwitcher() {
     <div className="relative">
       <button
         onClick={toggleLang}
-        className="xl:flex xl:items-center xl:gap-2 border rounded-3xl w-20 h-8 text-xs text-center xl:w-28 xl:h-10 xl:text-sm xl:px-3 hover:shadow dark:text-white"
+        className="xl:flex xl:items-center xl:gap-2 border rounded-3xl w-20 h-8 text-xs text-center xl:w-28 xl:h-10 xl:text-sm xl:px-3 hover:shadow dark:text-white dark:hover:shadow-customdark"
       >
         <i className="bx bx-globe !hidden xl:!block xl:text-lg " />
         Français

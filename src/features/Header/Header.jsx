@@ -49,7 +49,7 @@ const Header = ({ onToggleSidebar }) => (
       <div className="relative w-full xl:w-4/12 h-10 m-auto">
         <form role="search" id="form-search">
           <input
-            className="form-control w-10/12 h-10 border absolute bottom-0 right-0 rounded-3xl px-2 py-3 hidden hover:shadow focus:border-none xl:block  xl:w-full transition-colors duration-1000 dark:bg-slate-900 dark:placeholder-white"
+            className="form-control w-10/12 h-10 border absolute bottom-0 right-0 rounded-3xl px-2 py-3 hidden hover:shadow focus:border-none xl:block  xl:w-full transition-colors duration-1000 dark:bg-slate-900 dark:placeholder-white dark:hover:shadow-customdark"
             id="bar-search"
             type="search"
             placeholder="Recherche"

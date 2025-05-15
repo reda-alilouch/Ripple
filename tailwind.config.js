@@ -18,6 +18,9 @@ module.exports = {
         22: "5.5rem",
         "1/20": "5%",
       },
+      boxShadow: {
+        customdark :  "0px 1px 3px 0px rgba(255,255,255,0.75)",
+      }
     },
   },
   plugins: [],

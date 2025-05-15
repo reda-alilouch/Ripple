@@ -25,7 +25,7 @@ const Darkmode = () => {
       />
       <label
         htmlFor="checkbox"
-        className="checkbox-label border px-3 rounded-3xl w-20 h-8 xl:w-24 xl:h-10 hover:shadow"
+        className="checkbox-label border px-3 rounded-3xl w-20 h-8 xl:w-24 xl:h-10 hover:shadow dark:hover:shadow-customdark"
       >
         <i className="fa fa-moon dark:text-white"></i>
         <i className="fa fa-sun dark:text-white"></i>
