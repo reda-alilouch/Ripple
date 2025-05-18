@@ -3,7 +3,7 @@ import Carousel from "@/components/Carousel";
 import Titre from "@/components/Card/Titre/Titre";
 import Album from "@/components/Card/Album/Album";
 import Artiste from "@/components/Card/Artiste/Artiste";
-import Genre from "@/components/Card/Genre/Genre";
+
 import "@splidejs/react-splide/css";
 import { useState } from "react";
 
@@ -73,7 +73,7 @@ export default function Home() {
 
       <section className="section container px-5 pt-5 pb-5">
         <div className="head flex justify-between items-center mb-5">
-          <h2 className="top font-bold">Top genres</h2>
+          <h2 className="top font-bold">Top playlists</h2>
           <div className="voir-plus flex">
             <a href="#">
               <span className="voir">voir plus</span>
@@ -81,28 +81,8 @@ export default function Home() {
             </a>
           </div>
         </div>
-        <div
-          id="splide2"
-          className="splide"
-          aria-label="Splide Basic HTML Example"
-        >
-          <div className="splide__track">
-            <ul className="splide__list flex gap-3">
-              <Genre />
-              <Genre />
-              <Genre />
-              <Genre />
-              <Genre />
-              <Genre />
-              <Genre />
-              <Genre />
-              <Genre />
-              <Genre />
-              <Genre />
-              <Genre />
-            </ul>
-          </div>
-        </div>
+       
+       
       </section>
     </>
   );

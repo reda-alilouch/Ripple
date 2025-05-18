@@ -4,10 +4,9 @@ import Icon from "@/components/Icon";
 
 const AsidesArray = [
   { icon: "bxs-home", lib: "bx", namepage: "Accueil", href: "/"  },
-  { icon: "bxs-category", lib: "bx", namepage: "Genres", href: "/genres" },
-  { icon: "bxs-user", lib: "bx", namepage: "Artistes", href: "/artistes" },
-  { icon: "bxs-album", lib: "bx", namepage: "Albums", href: "/albums" },
-  { icon: "bxs-playlist", lib: "bx", namepage: "Playlistes", href: "/playlistes" },
+  { icon: "bxs-user", lib: "bx", namepage: "Artistes", href: "/Artistes" },
+  { icon: "bxs-album", lib: "bx", namepage: "Albums", href: "/Albums" },
+  { icon: "bxs-playlist", lib: "bx", namepage: "Playlistes", href: "/Playlistes" },
 ];
 
 const displayAsides = AsidesArray.map((item) => (
