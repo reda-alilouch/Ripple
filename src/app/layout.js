@@ -2,7 +2,7 @@
 
 import Header from "@/features/Header/Header";
 import Aside from "@/features/Aside";
-import Footer from "@/features/Footer/footer";
+import Footer from "@/src/features/Footer/Footer";
 import Audio from "@/features/Audio/Audio";
 import Carousel from "@/components/Carousel";
 import "./global.css";

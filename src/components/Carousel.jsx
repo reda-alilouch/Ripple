@@ -9,37 +9,37 @@ function Carousel() {
       <div className="splide__track">
         <ul className="splide__list">
           <li className="splide__slide">
-            <img src="" alt="" />
+            <img src="img/carousel.jpg" alt="" />
             <h2 className="text-center"></h2>
             <p className="text-center"></p>
             <Button />
           </li>
           <li className="splide__slide">
-            <img src="" alt="" />
+            <img src="img/carousel.jpg" alt="" />
             <h2 className="text-center"></h2>
             <p className="text-center"></p>
             <Button />
           </li>
           <li className="splide__slide">
-            <img src="" alt="" />
+            <img src="img/carousel.jpg" alt="" />
             <h2 className="text-center"></h2>
             <p className="text-center"></p>
             <Button />
           </li>
           <li className="splide__slide">
-            <img src="" alt="" />
+            <img src="img/carousel.jpg" alt="" />
             <h2 className="text-center"></h2>
             <p className="text-center"></p>
             <Button />
           </li>
           <li className="splide__slide">
-            <img src="" alt="" />
+            <img src="img/carousel.jpg" alt="" />
             <h2 className="text-center"></h2>
             <p className="text-center"></p>
             <Button />
           </li>
           <li className="splide__slide">
-            <img src="" alt="" />
+            <img src="img/carousel.jpg" alt="" />
             <h2 className="text-center"></h2>
             <p className="text-center"></p>
             <Button />

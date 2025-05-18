@@ -1,64 +1,89 @@
 "use client";
+import Carousel from "@/components/Carousel";
+import Titre from "@/components/Card/Titre/Titre";
+import Album from "@/components/Card/Album/Album";
+import Artiste from "@/components/Card/Artiste/Artiste";
+
+import "@splidejs/react-splide/css";
 import { useState } from "react";
 
-export default function HomePage() {
-  const [message, setMessage] = useState("");
-
-  const handleImport = async () => {
-    setMessage("Importation en cours...");
-
-    const client_id = "8488770d6a074502b2eca0b8cfecdbb0";
-    const client_secret = "574ce51d4be2452f86cafbfa628096b0";
-
-    try {
-      const authString = btoa(`${client_id}:${client_secret}`);
-
-      const tokenResponse = await fetch(
-        "https://accounts.spotify.com/api/token",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Basic ${authString}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: "grant_type=client_credentials",
-        }
-      );
-
-      if (!tokenResponse.ok) {
-        throw new Error("Erreur lors de la récupération du token.");
-      }
-
-      const tokenData = await tokenResponse.json();
-      const accessToken = tokenData.access_token;
-
-      const response = await fetch(
-        "https://api.spotify.com/v1/search?q=daft&type=artist",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des artistes.");
-      }
-
-      const data = await response.json();
-      console.log("✅ Données Spotify :", data);
-      setMessage("Importation réussie !");
-    } catch (error) {
-      console.error("❌ Erreur :", error.message);
-      setMessage("Erreur lors de l'import : " + error.message);
-    }
-  };
-
+export default function Home() {
   return (
-    <div style={{ padding: "6rem" }}>
-      <h1>Importation Spotify</h1>
-      <button onClick={handleImport}>Lancer l'import</button>
-      <p>{message}</p>
-    </div>
+    <>
+      <Carousel />
+
+      <section className="section container">
+        <div className="head pt-5 px-5">
+          <h2 className="top font-bold">Top titres</h2>
+        </div>
+        <div className="song-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <Titre />
+          <Titre />
+          <Titre />
+          <Titre />
+          <Titre className="hidden md:block" />
+          <Titre className="hidden md:block" />
+          <Titre className="hidden md:hidden lg:block" />
+          <Titre className="hidden md:hidden lg:block" />
+          <Titre className="hidden md:hidden lg:block" />
+        </div>
+      </section>
+      <section className="section container px-5 pt-5">
+        <div className="head flex justify-between items-center">
+          <h2 className="top font-bold">Top albums</h2>
+          <div className="voir-plus flex">
+            <a href="#">
+              <span className="voir">voir plus</span>
+
+              <i className="fa-solid fa-arrow-right arrow-rotation"></i>
+            </a>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-5 justify-center mt-5 md:grid-cols-3 lg:grid-cols-4">
+          <Album />
+          <Album />
+          <Album />
+          <Album />
+        </div>
+      </section>
+      <section className="section container px-5 pt-5 pb-5">
+        <div className="head flex justify-between items-center mb-5">
+          <h2 className="top font-bold">Top artistes</h2>
+          <div className="voir-plus">
+            <a href="#">
+              <span className="#">voir plus</span>
+              <i className="fa-solid fa-arrow-right arrow-rotation"></i>
+            </a>
+          </div>
+        </div>
+        <div
+          id="cards-container"
+          className="flex flex-wrap justify-center gap-7"
+        >
+          <Artiste />
+          <Artiste />
+          <Artiste />
+          <Artiste />
+          <Artiste className="lg:hidden" />
+          <Artiste className="lg:hidden" />
+          <Artiste className="hidden md:block" />
+          <Artiste className="hidden md:block lg:hidden xl:block" />
+        </div>
+      </section>
+
+      <section className="section container px-5 pt-5 pb-5">
+        <div className="head flex justify-between items-center mb-5">
+          <h2 className="top font-bold">Top playlists</h2>
+          <div className="voir-plus flex">
+            <a href="#">
+              <span className="voir">voir plus</span>
+              <i className="fa-solid fa-arrow-right arrow-rotation"></i>
+            </a>
+          </div>
+        </div>
+       
+       
+      </section>
+    </>
   );
 }

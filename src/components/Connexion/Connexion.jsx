@@ -13,7 +13,7 @@ export default function Connexion() {
       <Button
         id="btn-connexion"
         name="Connexion"
-        className="border rounded-3xl  w-20 h-8 text-xs text-center xl:w-28 xl:h-10 xl:text-sm xl:px-3 hover:shadow dark:text-white"
+        className="border rounded-3xl w-20 h-8 text-xs text-center xl:w-28 xl:h-10 xl:text-sm xl:px-3 hover:shadow dark:text-white dark:hover:shadow-customdark"
         onClick={openModal}
       />
 

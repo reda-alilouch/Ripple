@@ -1,16 +1,20 @@
-import mongoose from "mongoose";
+// lib/mongodb.js
 
-const MONGODB_URI = process.env.MONGODB_URI;
+import { MongoClient } from "mongodb";
 
-if (!MONGODB_URI) throw new Error("MongoDB URI manquant");
+const client = new MongoClient(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
-let cached = global.mongoose || { conn: null };
+let clientPromise;
 
-export async function connectToDatabase() {
-  if (cached.conn) return cached.conn;
-
-  cached.conn = await mongoose.connect(MONGODB_URI);
-  global.mongoose = cached;
-
-  return cached.conn;
+if (process.env.NODE_ENV === "development") {
+  // Dans le mode développement, on garde une seule instance pour éviter la reconnexion constante
+  clientPromise = globalThis.mongoClient ??= client.connect();
+} else {
+  // Dans les autres environnements, chaque requête aura une nouvelle instance
+  clientPromise = client.connect();
 }
+
+export default clientPromise;

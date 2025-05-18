@@ -1,5 +1,5 @@
 "use client";
-import styles from "@/features/Footer/footer.module.css";
+import styles from "@/src/features/Footer/Footer.module.css";
 const Footer = () => (
   <footer
     className={`${styles.footer} footer container px-5 py-5 grid grid-cols-1 sm:grid-cols-2 gap-5 xl:grid-cols-4 gap-8 items-start m-auto mb-20`}
