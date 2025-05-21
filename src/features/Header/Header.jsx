@@ -1,18 +1,18 @@
 "use client";
 
-import Button from "@/components/Button";
-import Icon from "@/components/Icon";
-import Darkmode from "@/components/Darkmode/Darkmode";
-import Lang from "@/components/Lang";
-import Connexion from "@/components/Connexion/Connexion";
+import Button from "@/src/components/Button";
+import Icon from "@/src/components/Icon";
+import Darkmode from "@/src/components/Darkmode/Darkmode";
+import Lang from "@/src/components/Lang";
+import Connexion from "@/src/components/Connexion/Connexion";
 
-import styles from "@/features/Header/Header.module.css";
+import styles from "@/src/features/Header/Header.module.css";
 
 import Image from "next/image";
 
-import { searchonclick } from "@/js/search";
-import { menuonclick } from "@/js/aside";
-import { handleConnexion } from "@/js/conexion";
+import { searchonclick } from "@/src/js/search";
+import { menuonclick } from "@/src/js/aside";
+import { handleConnexion } from "@/src/js/conexion";
 
 import React from "react";
 

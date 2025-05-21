@@ -1,5 +1,5 @@
 "use client";
-import "@/components/Darkmode/Darkmode.css"; // si tu utilises ce fichier
+import "@/src/components/Darkmode/Darkmode.css"; // si tu utilises ce fichier
 
 const Darkmode = () => {
   const toggleTheme = () => {
