@@ -1,20 +1,21 @@
 // lib/mongodb.js
+import mongoose from "mongoose";
 
-import { MongoClient } from "mongodb";
+const MONGODB_URI = process.env.MONGODB_URI;
 
-const client = new MongoClient(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+if (!MONGODB_URI) throw new Error("MONGODB_URI not set");
 
-let clientPromise;
+let cached = global.mongoose || { conn: null, promise: null };
 
-if (process.env.NODE_ENV === "development") {
-  // Dans le mode développement, on garde une seule instance pour éviter la reconnexion constante
-  clientPromise = globalThis.mongoClient ??= client.connect();
-} else {
-  // Dans les autres environnements, chaque requête aura une nouvelle instance
-  clientPromise = client.connect();
+export async function connectDB() {
+  if (cached.conn) return cached.conn;
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+  }
+  cached.conn = await cached.promise;
+  return cached.conn;
 }
-
-export default clientPromise;

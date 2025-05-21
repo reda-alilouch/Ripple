@@ -1,6 +1,6 @@
 "use client";
 import styles from "./Aside.module.css";
-import Icon from "@/components/Icon";
+import Icon from "@/src/components/Icon";
 
 const AsidesArray = [
   { icon: "bxs-home", lib: "bx", namepage: "Accueil", href: "/"  },

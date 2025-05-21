@@ -1,10 +1,10 @@
 "use client";
 
-import Header from "@/features/Header/Header";
-import Aside from "@/features/Aside";
+import Header from "@/src/features/Header/Header";
+import Aside from "@/src/features/Aside";
 import Footer from "@/src/features/Footer/Footer";
-import Audio from "@/features/Audio/Audio";
-import Carousel from "@/components/Carousel";
+import Audio from "@/src/features/Audio/Audio";
+
 import "./global.css";
 
 import { useEffect, useState } from "react";

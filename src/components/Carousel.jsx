@@ -1,7 +1,7 @@
 "use client";
 import Splide from "@splidejs/splide";
 import "@splidejs/splide/dist/css/splide.min.css";
-import Button from "@/components/Button";
+import Button from "@/src/components/Button";
 
 function Carousel() {
   return (

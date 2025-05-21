@@ -1,8 +1,10 @@
 "use client";
-import Carousel from "@/components/Carousel";
-import Titre from "@/components/Card/Titre/Titre";
-import Album from "@/components/Card/Album/Album";
-import Artiste from "@/components/Card/Artiste/Artiste";
+import Carousel from "@/src/components/Carousel";
+import Titre from "@/src/components/Card/Titre/Titre";
+import Album from "@/src/components/Card/Album/Album";
+import Artiste from "@/src/components/Card/Artiste/Artiste";
+import ListTrack from "@/src/components/CardList/TitreList";
+import ListAlbum from "@/src/components/CardList/Albumlist";
 
 import "@splidejs/react-splide/css";
 import { useState } from "react";
@@ -12,40 +14,10 @@ export default function Home() {
     <>
       <Carousel />
 
-      <section className="section container">
-        <div className="head pt-5 px-5">
-          <h2 className="top font-bold">Top titres</h2>
-        </div>
-        <div className="song-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          <Titre />
-          <Titre />
-          <Titre />
-          <Titre />
-          <Titre className="hidden md:block" />
-          <Titre className="hidden md:block" />
-          <Titre className="hidden md:hidden lg:block" />
-          <Titre className="hidden md:hidden lg:block" />
-          <Titre className="hidden md:hidden lg:block" />
-        </div>
-      </section>
-      <section className="section container px-5 pt-5">
-        <div className="head flex justify-between items-center">
-          <h2 className="top font-bold">Top albums</h2>
-          <div className="voir-plus flex">
-            <a href="#">
-              <span className="voir">voir plus</span>
+      <ListTrack />
+      <ListAlbum />
 
-              <i className="fa-solid fa-arrow-right arrow-rotation"></i>
-            </a>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-5 justify-center mt-5 md:grid-cols-3 lg:grid-cols-4">
-          <Album />
-          <Album />
-          <Album />
-          <Album />
-        </div>
-      </section>
+      
       <section className="section container px-5 pt-5 pb-5">
         <div className="head flex justify-between items-center mb-5">
           <h2 className="top font-bold">Top artistes</h2>
@@ -81,8 +53,6 @@ export default function Home() {
             </a>
           </div>
         </div>
-       
-       
       </section>
     </>
   );
