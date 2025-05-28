@@ -5,6 +5,7 @@ import Album from "@/src/components/Card/Album/Album";
 import Artiste from "@/src/components/Card/Artiste/Artiste";
 import ListTrack from "@/src/components/CardList/TitreList";
 import ListAlbum from "@/src/components/CardList/Albumlist";
+import ListArtiste from "@/src/components/CardList/Artistelist";
 
 import "@splidejs/react-splide/css";
 import { useState } from "react";
@@ -16,32 +17,7 @@ export default function Home() {
 
       <ListTrack />
       <ListAlbum />
-
-      
-      <section className="section container px-5 pt-5 pb-5">
-        <div className="head flex justify-between items-center mb-5">
-          <h2 className="top font-bold">Top artistes</h2>
-          <div className="voir-plus">
-            <a href="#">
-              <span className="#">voir plus</span>
-              <i className="fa-solid fa-arrow-right arrow-rotation"></i>
-            </a>
-          </div>
-        </div>
-        <div
-          id="cards-container"
-          className="flex flex-wrap justify-center gap-7"
-        >
-          <Artiste />
-          <Artiste />
-          <Artiste />
-          <Artiste />
-          <Artiste className="lg:hidden" />
-          <Artiste className="lg:hidden" />
-          <Artiste className="hidden md:block" />
-          <Artiste className="hidden md:block lg:hidden xl:block" />
-        </div>
-      </section>
+      <ListArtiste />
 
       <section className="section container px-5 pt-5 pb-5">
         <div className="head flex justify-between items-center mb-5">

@@ -11,9 +11,6 @@ export async function GET(req) {
   return Response.json(data);
 }
 
-// === Récupération du token d'accès Spotify ===
-
-// === Recherche globale Spotify ===
 async function fetchAllSpotifyData(accessToken, query) {
   const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
     query

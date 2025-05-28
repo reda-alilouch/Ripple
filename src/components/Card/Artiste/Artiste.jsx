@@ -1,19 +1,23 @@
 "use client";
 import styles from "./Artiste.module.css";
 
-const Artiste = ({ className = "", ...props }) => {
+const Artiste = ({ artist, className = "" }) => {
+  
+
   return (
-    <div className={`card-artistes ${className}`} {...props}>
+    <div className={`card-artistes ${className}`}>
       <a href="#">
-        <div className={`${styles.artistes} artistes w-28 h-32`}>
+        <div className="artistes w-28 h-32">
           <img
-            className="img-artistes w-full h-28 rounded-full"
-            src="img/portrait-woman-singing-microphone.jpg"
+            className="img-artistes w-full h-28 rounded-full object-cover"
+            src={artist.images?.[0]?.url || "/img/default-artist.jpg"}
+            alt={artist.name}
           />
-          <h3 className="h3-artistes">nom artiste</h3>
+          <h3 className="h3-artistes text-center">{artist.name}</h3>
         </div>
       </a>
     </div>
   );
 };
+
 export default Artiste;

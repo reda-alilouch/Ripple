@@ -1,21 +1,20 @@
-// lib/mongodb.js
-import mongoose from "mongoose";
+import { MongoClient } from "mongodb";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) throw new Error("MONGODB_URI not set");
-
-let cached = global.mongoose || { conn: null, promise: null };
-
-export async function connectDB() {
-  if (cached.conn) return cached.conn;
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-  }
-  cached.conn = await cached.promise;
-  return cached.conn;
+if (!uri) {
+  throw new Error("❌ MONGODB_URI manquant dans .env.local");
 }
+
+let client;
+let clientPromise;
+
+if (!global._mongoClient) {
+  client = new MongoClient(uri);
+  global._mongoClient = client;
+  clientPromise = client.connect();
+} else {
+  clientPromise = Promise.resolve(global._mongoClient);
+}
+
+export default clientPromise;
