@@ -2,7 +2,7 @@
 "use client";
 import styles from "./Titre.module.css";
 import Icon from "@/src/components/Icon";
-import { formatDuration } from "@/src/lib/utils";
+
 
 const Titre = ({ track, className = "" }) => {
   if (!track) return null;
@@ -22,23 +22,23 @@ const Titre = ({ track, className = "" }) => {
   return (
     <div className={`mr-5 mt-5 ms-5 pr-5 w-full ${className}`}>
       <div className={`${styles.titre} titre`}>
-        <div className="img-h3 w-full flex items-center">
+        <div className="flex items-center w-full img-h3">
           <a href="#" onClick={handlePlay}>
             <div className="">
               <img
-                className="img-titre rounded-md  object-cover"
+                className="object-cover rounded-md img-titre"
                 src={track.album?.images[0]?.url}
                 alt={track.name}
               />
              
             </div>
           </a>
-          <div className="h3 pl-2">
+          <div className="pl-2 h3">
             <h3 className="font-medium">{track.name}</h3>
             <a href=""><h3 className="text-sm text-gray-500">{track.artists[0]?.name}</h3></a>
           </div>
         </div>
-        <div className="icon-time flex items-center gap-2">
+        <div className="flex items-center gap-2 icon-time">
           <p>{formatDuration(track.duration_ms)}</p>
           <button onClick={handleAddToPlaylist}>
             <Icon lib="fa-solid" name="fa-plus" className="titre__icon" />

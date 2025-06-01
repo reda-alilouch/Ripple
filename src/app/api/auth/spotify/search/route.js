@@ -1,4 +1,17 @@
-export async function fetchAllSpotifyData(accessToken, query) {
+import { NextResponse } from "next/server";
+import { getAccessToken } from "@/src/lib/spotify.js";
+// GET /api/spotify/search?q=eminem
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const query = searchParams.get("q") || "top hits"; // valeur par défaut
+
+  const accessToken = await getAccessToken();
+  const data = await fetchAllSpotifyData(accessToken, query);
+
+  return Response.json(data);
+}
+
+async function fetchAllSpotifyData(accessToken, query) {
   const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
     query
   )}&type=album,artist,track,playlist&limit=10`;
@@ -15,16 +28,10 @@ export async function fetchAllSpotifyData(accessToken, query) {
 
   const data = await response.json();
 
-  // Les genres peuvent être extraits à partir des artistes
-  const genres = data.artists?.items
-    ?.flatMap((artist) => artist.genres)
-    ?.filter((genre, index, self) => self.indexOf(genre) === index); // unique
-
   return {
     albums: data.albums?.items || [],
     artists: data.artists?.items || [],
     tracks: data.tracks?.items || [],
     playlists: data.playlists?.items || [],
-    genres: genres || [],
   };
 }
