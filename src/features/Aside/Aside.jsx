@@ -1,12 +1,17 @@
 "use client";
 import styles from "./Aside.module.css";
-import Icon from "@/src/components/Icon";
+import Icon from "@/components/Icon/index";
 
 const AsidesArray = [
-  { icon: "bxs-home", lib: "bx", namepage: "Accueil", href: "/"  },
+  { icon: "bxs-home", lib: "bx", namepage: "Accueil", href: "/" },
   { icon: "bxs-user", lib: "bx", namepage: "Artistes", href: "/Artistes" },
   { icon: "bxs-album", lib: "bx", namepage: "Albums", href: "/Albums" },
-  { icon: "bxs-playlist", lib: "bx", namepage: "Playlistes", href: "/Playlistes" },
+  {
+    icon: "bxs-playlist",
+    lib: "bx",
+    namepage: "Playlistes",
+    href: "/Playlistes",
+  },
 ];
 
 const displayAsides = AsidesArray.map((item) => (

@@ -1,20 +1,22 @@
 "use client";
 import { useEffect, useState } from "react";
-import Album from "@/src/components/Card/Album/Album";
-
-import { useEffect, useState } from "react";
-import Album from "@/src/components/Card/Album/Album";
+import Album from "@/components/Card/Album/Album";
 
 export default function ListAlbum() {
   const [albums, setAlbums] = useState([]);
 
   useEffect(() => {
-    fetch("/api/spotify/search")
-      .then((res) => res.json())
+    fetch("/api/spotify/user-data")
+      .then(async (res) => {
+        const text = await res.text();
+        if (!text) throw new Error("❌ Réponse vide de l'API");
+        return JSON.parse(text);
+      })
       .then((data) => {
-        console.log("DATA BRUTE:", data);
+        console.log("🎧 Albums reçus:", data);
+
         if (Array.isArray(data.albums)) {
-          setAlbums(data.albums.slice(0, 4)); // On récupère jusqu'à 4 albums
+          setAlbums(data.albums.slice(0, 4));
         } else {
           console.error("❌ Les albums ne sont pas un tableau :", data.albums);
         }
@@ -38,15 +40,17 @@ export default function ListAlbum() {
         {albums.length === 0 && <p className="px-5">Aucun album trouvé.</p>}
 
         {albums.map((album, index) => {
+          let classNamealbum = "";
 
-          if (index === 3) {
-          const =  className = "block md:hidden lg:block"; // ❌ cachée sur md, ✅ visible sur autres tailles
+          // On cache le 4e album (index 3) sur les écrans de taille moyenne (md)
+
+          if (index < 2) {
+            classNamealbum = "";
+          } else if (index >= 3) {
+            classNamealbum = "block md:hidden lg:block";
           }
-
           return (
-            <div key={album.id} className={className}>
-              <Album album={album} />
-            </div>
+            <Album album={album} key={album.id} className={classNamealbum} />
           );
         })}
       </div>

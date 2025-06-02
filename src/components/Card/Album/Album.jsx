@@ -1,43 +1,30 @@
 "use client";
+import Image from "next/image";
+import Icon from "@/components/Icon";
 
-import Link from "next/link";
-
-export default function Album({ album, className = "", ...props }) {
-  if (!album) return null;
-
-  const albumId = album.id;
-  const artist = album.artists?.[0];
-  const artistId = artist?.id;
-  const artistName = artist?.name || "Inconnu";
-
+const Album = ({ album, className = "" }) => {
   return (
-    <div className={`card-album rounded relative ${className}`} {...props}>
-      <Link href={`/album/${albumId}`}>
-        <img
-          className="album-img rounded w-full h-full object-cover opacity-70"
-          src={album.images?.[0]?.url || "/placeholder.jpg"}
-          alt={album.name}
+    <div className={`album-card ${className}`}>
+      <div className="album-image relative">
+        <Image
+          src={album?.images?.[0]?.url || "/placeholder-album.jpg"}
+          alt={album?.name || "Album cover"}
+          width={200}
+          height={200}
+          className="rounded-lg"
         />
-      </Link>
-
-      <div className="icon-album absolute top-0 right-0 flex gap-2 p-2 opacity-0 hover:opacity-100 transition-all duration-300">
-        <Link href={`/album/${albumId}`}>
-          <i className="icon fa-solid fa-circle-play"></i>
-        </Link>
+        <div className="play-button absolute right-2 bottom-2">
+          <Icon lib="fa-solid" name="fa-play" className="text-xl" />
+        </div>
       </div>
-
-      <div className="h3-album absolute bottom-0 px-2 py-1 bg-black bg-opacity-50 w-full">
-        <h3 className="text-base text-white truncate">{album.name}</h3>
-        {artistId ? (
-          <Link href={`/artist/${artistId}`}>
-            <h4 className="text-sm text-gray-300 hover:underline">
-              {artistName}
-            </h4>
-          </Link>
-        ) : (
-          <h4 className="text-sm text-gray-400 italic">Artiste inconnu</h4>
-        )}
-      </div>
+      <h3 className="album-title font-semibold mt-2">
+        {album?.name || "Album Title"}
+      </h3>
+      <p className="album-artist text-sm text-gray-600">
+        {album?.artists?.[0]?.name || "Artist Name"}
+      </p>
     </div>
   );
-}
+};
+
+export default Album;

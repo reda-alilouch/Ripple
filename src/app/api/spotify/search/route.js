@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAccessToken } from "@/src/lib/spotify/getAccessToken";
+import { getAccessToken } from "@/lib/spotify.js";
 // GET /api/spotify/search?q=eminem
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
@@ -11,9 +11,6 @@ export async function GET(req) {
   return Response.json(data);
 }
 
-// === Récupération du token d'accès Spotify ===
-
-// === Recherche globale Spotify ===
 async function fetchAllSpotifyData(accessToken, query) {
   const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
     query

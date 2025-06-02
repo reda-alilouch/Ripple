@@ -1,10 +1,20 @@
-
 "use client";
 
-const Button = ({ id, name, className = "", onClick, ...props }) => {
+const Button = ({
+  children,
+  className = "",
+  onClick,
+  type = "button",
+  ...props
+}) => {
   return (
-    <button id={id} onClick={onClick} className={`btn ${className}`} {...props}>
-      {name}
+    <button
+      type={type}
+      onClick={onClick}
+      className={`px-4 py-2 bg-[#ff4545] text-white rounded-lg hover:bg-[#ff3535] transition-colors ${className}`}
+      {...props}
+    >
+      {children || "Button"}
     </button>
   );
 };

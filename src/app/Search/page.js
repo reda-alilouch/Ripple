@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Titre from "@/src/components/Titre"; // Ajustez le chemin si nécessaire
+import Titre from "@/components/Card/Titre/Titre";
 
 export default function SearchPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,8 +16,10 @@ export default function SearchPage() {
     setError(null);
 
     try {
-      const response = await fetch(`/api/spotify/search?q=${encodeURIComponent(searchTerm)}`);
-      
+      const response = await fetch(
+        `/api/spotify/search?q=${encodeURIComponent(searchTerm)}`
+      );
+
       if (!response.ok) {
         throw new Error("Erreur lors de la recherche");
       }
@@ -67,14 +69,16 @@ export default function SearchPage() {
                   key={track.id}
                   trackName={track.name}
                   artistName={track.artists[0].name}
-                  albumImage={track.album.images[0]?.url || "/img/default-cover.jpg"}
+                  albumImage={
+                    track.album.images[0]?.url || "/img/default-cover.jpg"
+                  }
                   duration={track.duration_ms}
                   trackId={track.id}
                 />
               ))}
             </div>
           )}
-          
+
           {/* Vous pouvez ajouter d'autres sections pour albums, artistes, etc. */}
         </div>
       )}
