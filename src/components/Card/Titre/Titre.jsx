@@ -1,55 +1,51 @@
-// src/components/Titre.jsx
+// src/components/Card/Titre/Titre.jsx
 "use client";
-import styles from "./Titre.module.css";
-import Icon from "@/src/components/Icon";
-
+import Icon from "@/components/Icon";
 
 const Titre = ({ track, className = "" }) => {
-  if (!track) return null;
-
-  const handlePlay = () => {
-    console.log("Lecture de:", track.name, "par", track.artists[0]?.name);
-  };
-
-  const handleAddToPlaylist = () => {
-    console.log("Ajout à la playlist:", track.name);
-  };
-
-  const handleLike = () => {
-    console.log("Like pour:", track.name);
-  };
-
   return (
-    <div className={`mr-5 mt-5 ms-5 pr-5 w-full ${className}`}>
-      <div className={`${styles.titre} titre`}>
-        <div className="flex items-center w-full img-h3">
-          <a href="#" onClick={handlePlay}>
-            <div className="">
-              <img
-                className="object-cover rounded-md img-titre"
-                src={track.album?.images[0]?.url}
-                alt={track.name}
-              />
-             
-            </div>
-          </a>
-          <div className="pl-2 h3">
-            <h3 className="font-medium">{track.name}</h3>
-            <a href=""><h3 className="text-sm text-gray-500">{track.artists[0]?.name}</h3></a>
-          </div>
+    <div
+      className={`track-card flex items-center gap-4 p-3 hover:bg-gray-100 rounded-lg ${className}`}
+    >
+      <div className="relative w-12 h-12 track-image">
+        <img
+          src={track?.album?.images?.[0]?.url || "/placeholder-track.jpg"}
+          alt={track?.name || "Track cover"}
+          className="object-cover w-full h-full rounded"
+        />
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 play-button hover:opacity-100">
+          <Icon lib="fa-solid" name="fa-play" className="text-white" />
         </div>
-        <div className="flex items-center gap-2 icon-time">
-          <p>{formatDuration(track.duration_ms)}</p>
-          <button onClick={handleAddToPlaylist}>
-            <Icon lib="fa-solid" name="fa-plus" className="titre__icon" />
-          </button>
-          <button onClick={handleLike}>
-            <Icon lib="fa-regular" name="fa-heart" className="titre__icon" />
-          </button>
-        </div>
+      </div>
+      <div className="flex-1 track-info">
+        <h3 className="font-medium track-title">
+          {track?.name || "Track Title"}
+        </h3>
+        <p className="text-sm text-gray-600 track-artist">
+          {track?.artists?.[0]?.name || "Artist Name"}
+        </p>
+      </div>
+      <div className="text-sm text-gray-600 track-duration">
+        {track?.duration_ms
+          ? Math.floor(track.duration_ms / 1000 / 60) +
+            ":" +
+            String(Math.floor((track.duration_ms / 1000) % 60)).padStart(2, "0")
+          : "0:00"}
       </div>
     </div>
   );
 };
 
 export default Titre;
+
+const dev = {
+  name: "ALILOUCH Reda",
+  stack: ["React", "PHP", "MongoDB", "Next.js"],
+  strengths: [
+    "Résolution de problèmes",
+    "Apprentissage rapide",
+    "Créativité",
+    "Travail en équipe",
+  ],
+  mission: "Créer des expériences web puissantes",
+};

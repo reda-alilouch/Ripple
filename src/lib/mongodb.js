@@ -1,42 +1,34 @@
-import mongoose from "mongoose";
+import { MongoClient } from "mongodb";
 
-// Add error handling and connection state check
-export const connectMongoDB = async () => {
-  try {
-    // Check if we're already connected
-    if (mongoose.connection.readyState === 1) {
-      console.log("MongoDB is already connected");
-      return;
-    }
+if (!process.env.MONGODB_URI) {
+  throw new Error("Please add your MongoDB URI to .env.local");
+}
 
-    if (!process.env.MONGODB_URI) {
-      throw new Error("MONGODB_URI is not defined in environment variables");
-    }
-
-    await mongoose.connect(process.env.MONGODB_URI);
-    
-    // Add more detailed logging
-    console.log("Successfully connected to MongoDB");
-    console.log("Connection state:", mongoose.connection.readyState);
-    console.log("Database name:", mongoose.connection.name);
-
-    // Add connection event listeners
-    mongoose.connection.on("connected", () => {
-      console.log("MongoDB connected event fired");
-    });
-
-    mongoose.connection.on("error", (err) => {
-      console.error("MongoDB connection error:", err);
-    });
-
-    mongoose.connection.on("disconnected", () => {
-      console.log("MongoDB disconnected");
-    });
-
-  } catch (error) {
-    console.error("Failed to connect to MongoDB:");
-    console.error("Error details:", error);
-    throw error; // Re-throw the error for proper error handling
-  }
+const uri = process.env.MONGODB_URI;
+const options = {
+  family: 4, // Force IPv4
 };
 
+let client;
+let clientPromise;
+
+if (process.env.NODE_ENV === "development") {
+  if (!global._mongoClientPromise) {
+    client = new MongoClient(uri, options);
+    global._mongoClientPromise = client.connect();
+  }
+  clientPromise = global._mongoClientPromise;
+} else {
+  client = new MongoClient(uri, options);
+  clientPromise = client.connect();
+}
+
+export default async function connectMongoDB() {
+  try {
+    const client = await clientPromise;
+    return client;
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    throw error;
+  }
+}

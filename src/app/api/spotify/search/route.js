@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAccessToken } from "@/src/lib/spotify.js";
+import { getAccessToken } from "@/lib/spotify.js";
 // GET /api/spotify/search?q=eminem
 export async function GET(req) {
   const { searchParams } = new URL(req.url);

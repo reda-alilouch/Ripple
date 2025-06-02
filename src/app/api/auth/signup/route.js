@@ -24,7 +24,7 @@ export async function POST(request) {
       );
     }
 
-    const client = await clientPromise;
+    const client = await connectMongoDB();
     const db = client.db(process.env.MONGODB_DB);
 
     // Vérifier si l'utilisateur existe déjà
@@ -126,4 +126,3 @@ Dans MongoDB, ce code effectue les opérations suivantes :
    - Gestion des erreurs MongoDB
    - Nettoyage des données sensibles avant envoi
 */
-

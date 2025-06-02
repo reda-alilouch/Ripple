@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import Button from "@/src/components/Button";
-import Modal from "@/src/components/Modal/Modal";
+import Button from "@/components/Button";
+import Modal from "@/components/Modal/Modal";
 
 export default function Connexion() {
   const [isOpen, setIsOpen] = useState(false);

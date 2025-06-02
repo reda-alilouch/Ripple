@@ -14,7 +14,9 @@ const logAction = (action, details) => {
 // Fonction pour gérer les erreurs
 const handleError = (error, context) => {
   console.error(`[Modal Error - ${context}]:`, error);
-  return error.response?.data?.message || error.message || "Une erreur est survenue";
+  return (
+    error.response?.data?.message || error.message || "Une erreur est survenue"
+  );
 };
 
 // Fonction pour se connecter à MongoDB
@@ -95,86 +97,85 @@ export default function Modal({ isOpen, closeModal }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/80">
-  <div className="p-6 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg shadow-xl w-96">
-    <h2 className="mb-4 text-xl font-bold text-center">
-      {isSignUp ? "Inscription" : "Connexion"}
-    </h2>
+      <div className="p-6 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg shadow-xl w-96">
+        <h2 className="mb-4 text-xl font-bold text-center">
+          {isSignUp ? "Inscription" : "Connexion"}
+        </h2>
 
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      {isSignUp && (
-        <input
-          type="text"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Nom complet"
-          required
-          className="px-3 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400"
-        />
-      )}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {isSignUp && (
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="Nom complet"
+              required
+              className="px-3 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400"
+            />
+          )}
 
-      <input
-        type="email"
-        name="email"
-        value={form.email}
-        onChange={handleChange}
-        placeholder="Email"
-        required
-        className="px-3 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400"
-      />
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Email"
+            required
+            className="px-3 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400"
+          />
 
-      <div className="relative">
-        <input
-          type={showPassword ? "text" : "password"}
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          placeholder="Mot de passe"
-          required
-          className="w-full px-3 py-2 pr-10 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400"
-        />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Mot de passe"
+              required
+              className="w-full px-3 py-2 pr-10 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute text-gray-500 dark:text-gray-300 right-2 top-2"
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+
+          {error && (
+            <div className="p-2 text-sm text-red-600 bg-red-100 dark:bg-red-800 dark:text-red-200 rounded">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="py-2 text-white bg-green-600 rounded hover:bg-green-700"
+          >
+            {isSignUp ? "S'inscrire" : "Se connecter"}
+          </button>
+        </form>
+
+        <p className="mt-4 text-sm text-center">
+          {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}{" "}
+          <button
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-blue-600 dark:text-blue-400 underline"
+          >
+            {isSignUp ? "Connexion" : "Inscription"}
+          </button>
+        </p>
+
         <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute text-gray-500 dark:text-gray-300 right-2 top-2"
+          onClick={closeModal}
+          className="block mx-auto mt-4 text-sm text-gray-500 dark:text-gray-300 underline"
         >
-          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          Fermer
         </button>
       </div>
-
-      {error && (
-        <div className="p-2 text-sm text-red-600 bg-red-100 dark:bg-red-800 dark:text-red-200 rounded">
-          {error}
-        </div>
-      )}
-
-      <button
-        type="submit"
-        className="py-2 text-white bg-green-600 rounded hover:bg-green-700"
-      >
-        {isSignUp ? "S'inscrire" : "Se connecter"}
-      </button>
-    </form>
-
-    <p className="mt-4 text-sm text-center">
-      {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}{" "}
-      <button
-        onClick={() => setIsSignUp(!isSignUp)}
-        className="text-blue-600 dark:text-blue-400 underline"
-      >
-        {isSignUp ? "Connexion" : "Inscription"}
-      </button>
-    </p>
-
-    <button
-      onClick={closeModal}
-      className="block mx-auto mt-4 text-sm text-gray-500 dark:text-gray-300 underline"
-    >
-      Fermer
-    </button>
-  </div>
-</div>
-
+    </div>
   );
 }
 /*
@@ -201,11 +202,3 @@ Flux technique inscription -> connexion :
 3. Authentification via NextAuth
 4. Redirection dashboard
 */
-
-
-
-
-
-
-
-

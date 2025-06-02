@@ -1,5 +1,5 @@
 "use client";
-import "@/src/components/Darkmode/Darkmode.css"; // si tu utilises ce fichier
+import "./Darkmode.css"; // Changement du chemin pour un chemin relatif
 
 const Darkmode = () => {
   const toggleTheme = () => {

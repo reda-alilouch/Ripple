@@ -104,3 +104,27 @@ export const getUserPlaylists = async (accessToken, limit = 50) => {
     throw error;
   }
 };
+
+// Obtenir un token d'accès client
+export const getAccessToken = async () => {
+  try {
+    const response = await axios.post(
+      "https://accounts.spotify.com/api/token",
+      new URLSearchParams({
+        grant_type: "client_credentials",
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+        client_secret: process.env.SPOTIFY_CLIENT_SECRET,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    return response.data.access_token;
+  } catch (error) {
+    console.error("Erreur obtention token Spotify:", error.response?.data);
+    throw error;
+  }
+};

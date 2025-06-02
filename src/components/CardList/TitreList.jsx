@@ -1,53 +1,77 @@
 "use client";
-import { useEffect, useState } from "react";
-import Titre from "@/src/components/Card/Titre/Titre"; // Corrige ce chemin si besoin
-export default function ListTrack() {
+import { useState, useEffect } from "react";
+import Titre from "@/components/Card/Titre/Titre";
+
+export default function TitreList() {
   const [tracks, setTracks] = useState([]);
-useEffect(() => {
-  fetch("/api/spotify/user-data")
-    .then(async (res) => {
-      console.log("📡 Réponse brute:", res);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-      const text = await res.text();
-      if (!text) {
-        throw new Error("❌ Réponse vide de l’API Spotify");
+  useEffect(() => {
+    const fetchTracks = async () => {
+      try {
+        const response = await fetch("/api/spotify/data?type=tracks&limit=10");
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des titres");
+        }
+        const data = await response.json();
+        setTracks(data.tracks || []);
+      } catch (err) {
+        console.error("Erreur:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      return JSON.parse(text);
-    })
-    .then((data) => {
-      console.log("📦 Données JSON reçues:", data);
-      if (data.tracks) {
-        const topTracks = data.tracks.slice(0, 9);
-        setTracks(topTracks);
-      } else {
-        console.warn("⚠️ Données reçues sans champs 'tracks'");
-      }
-    })
-    .catch((err) => {
-      console.error("❌ Erreur API:", err);
-    });
-}, []);
+    fetchTracks();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center p-4">Chargement des titres...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500 p-4">{error}</div>;
+  }
+
+  if (tracks.length === 0) {
+    return (
+      <div className="text-center p-4">
+        Aucun titre trouvé.
+        <button
+          onClick={async () => {
+            try {
+              const response = await fetch("/api/spotify/sync");
+              if (!response.ok) throw new Error("Erreur de synchronisation");
+              window.location.reload();
+            } catch (err) {
+              setError(err.message);
+            }
+          }}
+          className="ml-2 text-blue-500 hover:text-blue-700"
+        >
+          Synchroniser avec Spotify
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <section className="section container">
-      <div className="head pt-5 px-5">
-        <h2 className="top font-bold">Top titres</h2>
+    <div className="container mx-auto px-4 py-8">
+      <h2 className="text-2xl font-bold mb-6">Titres populaires</h2>
+      <div className="grid gap-4">
+        {tracks.map((track) => (
+          <Titre
+            key={track.spotifyId}
+            trackName={track.name}
+            artistName={track.artists[0]?.name || "Artiste inconnu"}
+            albumImage={track.album.images[0]?.url || "/placeholder-track.jpg"}
+            duration={track.duration_ms}
+            trackId={track.spotifyId}
+          />
+        ))}
       </div>
-      <div className="song-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {tracks.length === 0 && <p className="px-5">Aucun titre trouvé.</p>}
-        {tracks.map((track, index) => {
-          let className = "";
-          if (index < 4) {
-            className = "";
-          } else if (index >= 3 && index < 6) {
-            className = "hidden sm:block";
-          } else if (index >= 6 && index < 9) {
-            className = "hidden sm:hidden md:hidden lg:block";
-          }
-          return <Titre key={track.id} track={track} className={className} />;
-        })}
-      </div>
-    </section>
+    </div>
   );
 }

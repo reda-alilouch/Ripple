@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import Album from "@/src/components/Card/Album/Album";
+import Album from "@/components/Card/Album/Album";
 
 export default function ListAlbum() {
   const [albums, setAlbums] = useState([]);
