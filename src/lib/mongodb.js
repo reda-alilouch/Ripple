@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { MongoClient } from "mongodb";
 
 if (!process.env.MONGODB_URI) {
@@ -23,12 +24,24 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = client.connect();
 }
 
-export default async function connectMongoDB() {
+// Export a module-scoped MongoClient promise
+export { clientPromise };
+
+// Mongoose connection for models
+export const connectMongoDB = async () => {
   try {
-    const client = await clientPromise;
-    return client;
+    if (mongoose.connection.readyState === 1) {
+      return mongoose.connection;
+    }
+
+    const conn = await mongoose.connect(uri, {
+      maxPoolSize: 10,
+    });
+
+    console.log("MongoDB Connected");
+    return conn;
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     throw error;
   }
-}
+};

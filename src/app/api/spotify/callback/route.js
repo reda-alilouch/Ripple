@@ -13,13 +13,13 @@ export async function GET(request) {
 
     if (error) {
       return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/dashboard?error=spotify_denied`
+        `${process.env.NEXTAUTH_URL}/profil?error=spotify_denied`
       );
     }
 
     if (!code || !state) {
       return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/dashboard?error=missing_params`
+        `${process.env.NEXTAUTH_URL}/profil?error=missing_params`
       );
     }
 
@@ -27,7 +27,7 @@ export async function GET(request) {
     const [stateCode, userToken] = state.split("_");
     if (!userToken) {
       return NextResponse.redirect(
-        `${process.env.NEXTAUTH_URL}/dashboard?error=invalid_state`
+        `${process.env.NEXTAUTH_URL}/profil?error=invalid_state`
       );
     }
 
@@ -73,14 +73,14 @@ export async function GET(request) {
       }
     );
 
-    // Rediriger vers le dashboard avec succès
+    // Rediriger vers le profil avec succès
     return NextResponse.redirect(
-      `${process.env.NEXTAUTH_URL}/dashboard?spotify=connected`
+      `${process.env.NEXTAUTH_URL}/profil?spotify=connected`
     );
   } catch (error) {
     console.error("Erreur callback Spotify:", error);
     return NextResponse.redirect(
-      `${process.env.NEXTAUTH_URL}/dashboard?error=spotify_callback`
+      `${process.env.NEXTAUTH_URL}/profil?error=spotify_callback`
     );
   }
 }

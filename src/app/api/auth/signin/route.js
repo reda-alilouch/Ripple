@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import connectMongoDB from "@/lib/mongodb";
-import { comparePassword, generateToken } from "@/lib/auth";
+import { connectMongoDB } from "@/lib/mongodb";
+import User from "@/models/users";
+import { comparePassword } from "@/lib/auth";
 
 export async function POST(request) {
   try {
@@ -14,11 +15,11 @@ export async function POST(request) {
       );
     }
 
-    const client = await clientPromise;
-    const db = client.db(process.env.MONGODB_DB);
+    // Connexion à MongoDB
+    await connectMongoDB();
 
     // Trouver l'utilisateur
-    const user = await db.collection("users").findOne({ email });
+    const user = await User.findOne({ email, provider: "credentials" });
     if (!user) {
       return NextResponse.json(
         { success: false, error: "Identifiants invalides" },
@@ -35,32 +36,18 @@ export async function POST(request) {
       );
     }
 
-    // Mettre à jour lastLogin
-    await db
-      .collection("users")
-      .updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } });
-
-    // Générer le token JWT
-    const token = generateToken({
-      userId: user._id,
-      email: user.email,
-      name: user.name,
-    });
-
     // Réponse sans le mot de passe
     const userResponse = {
-      id: user._id,
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
-      spotifyConnected: user.spotifyConnected || false,
-      spotifyProfile: user.spotifyProfile || null,
+      provider: user.provider,
     };
 
     return NextResponse.json({
       success: true,
       message: "Connexion réussie",
       user: userResponse,
-      token,
     });
   } catch (error) {
     console.error("Erreur signin:", error);
