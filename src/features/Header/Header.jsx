@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
 import Darkmode from "@/components/Darkmode/Darkmode";
@@ -28,22 +28,26 @@ const Header = ({ onToggleSidebar }) => (
       <i className="text-3xl bx bx-menu aside-toggle" id="aside-toggle"></i>
     </div>
     <div className="logo">
-      <Image
-        src="/lightmd.png"
-        alt="ripple logo"
-        width={130}
-        height={38}
-        priority
-        className="block dark:hidden"
-      />
-      <Image
-        src="/darkmd.png"
-        alt="ripple logo"
-        width={130}
-        height={38}
-        priority
-        className="hidden dark:block"
-      />
+      <Link href="/">
+        <Image
+          src="/lightmd.png"
+          alt="ripple logo"
+          width={130}
+          height={38}
+          priority
+          className="block dark:hidden"
+        />
+      </Link>
+      <Link href="/">
+        <Image
+          src="/darkmd.png"
+          alt="ripple logo"
+          width={130}
+          height={38}
+          priority
+          className="hidden dark:block"
+        />
+      </Link>
     </div>
     <nav className="w-full h-10 xl:flex xl:gap-10 xl:items-center">
       <div className="relative w-full h-10 m-auto xl:w-4/12">

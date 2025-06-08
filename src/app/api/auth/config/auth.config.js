@@ -1,0 +1,48 @@
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import { clientPromise } from "@/lib/mongodb";
+import { authProviders } from "@/lib/auth-providers";
+
+export const authConfig = {
+  adapter: MongoDBAdapter(clientPromise),
+  providers: [authProviders.google(), authProviders.credentials()],
+  pages: {
+    signIn: "/",
+    error: "/",
+    newUser: "/profil",
+  },
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      return true;
+    },
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url;
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      return `${baseUrl}/profil`;
+    },
+    async session({ session, token }) {
+      if (token?.sub) {
+        session.user.id = token.sub;
+      }
+      if (token?.provider) {
+        session.user.provider = token.provider;
+      }
+      return session;
+    },
+    async jwt({ token, user, account }) {
+      if (user) {
+        token.sub = user.id;
+      }
+      if (account) {
+        token.provider = account.provider;
+      }
+      return token;
+    },
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 jours
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
+  useSecureCookies: process.env.NODE_ENV === "production",
+};

@@ -1,6 +1,7 @@
 "use client";
 import styles from "./Aside.module.css";
 import Icon from "@/components/Icon/index";
+import Link from "next/link";
 
 const AsidesArray = [
   { icon: "bxs-home", lib: "bx", namepage: "Accueil", href: "/" },
@@ -16,14 +17,14 @@ const AsidesArray = [
 
 const displayAsides = AsidesArray.map((item) => (
   <li className="mb-2 sm:text-base md:text-lg md:mb-4 xl:text-xl xl:mb-6">
-    <a href={`${item.href}`}>
+    <Link href={`${item.href}`}>
       <Icon
         lib={`${item.lib}`}
         name={`${item.icon}`}
         className="mr-2 xl:mr-6"
       />
       <span className="nompage xl:hidden">{item.namepage}</span>
-    </a>
+    </Link>
   </li>
 ));
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -15,7 +14,7 @@ const logAction = (action, details) => {
 const handleError = (error, context) => {
   console.error(`[Modal Error - ${context}]:`, error);
   return (
-    error.response?.data?.message || error.message || "Une erreur est survenue"
+    error.response?.data?.error || error.message || "Une erreur est survenue"
   );
 };
 
@@ -36,60 +35,71 @@ export default function Modal({ isOpen, closeModal }) {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError(""); // Effacer l'erreur quand l'utilisateur modifie un champ
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true);
 
-    if (isSignUp) {
-      // Inscription
-      try {
-        const res = await fetch("/api/auth/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
-        });
+    try {
+      if (isSignUp) {
+        // Inscription
+        const res = await axios.post("/api/auth/signup", form);
+        if (res.data.success) {
+          // Si l'inscription réussit, connecter automatiquement
+          const signInResult = await signIn("credentials", {
+            email: form.email,
+            password: form.password,
+            redirect: false,
+          });
 
-        const contentType = res.headers.get("content-type");
-        if (!contentType || !contentType.includes("application/json")) {
-          throw new Error("Réponse invalide du serveur");
+          if (signInResult?.error) {
+            setError(
+              "Inscription réussie, mais erreur lors de la connexion automatique"
+            );
+          } else {
+            router.refresh();
+            closeModal();
+          }
         }
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.message || "Erreur lors de l'inscription");
-        }
-
-        alert("✅ Inscription réussie !");
-        setIsSignUp(false); // Revenir à la connexion
-      } catch (err) {
-        setError(err.message);
-      }
-    } else {
-      // Connexion
-      try {
-        const res = await signIn("credentials", {
+      } else {
+        // Connexion
+        const result = await signIn("credentials", {
           email: form.email,
           password: form.password,
           redirect: false,
         });
 
-        if (res.error) {
-          setError("Email ou mot de passe invalide.");
+        if (result?.error) {
+          setError("Email ou mot de passe incorrect");
         } else {
-          router.replace("/dashboard");
+          router.refresh();
           closeModal();
         }
-      } catch (err) {
-        setError("Erreur lors de la connexion");
       }
+    } catch (err) {
+      setError(handleError(err, isSignUp ? "signup" : "signin"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError("");
+    setIsLoading(true);
+    try {
+      await signIn("google", { callbackUrl: "/profil" });
+    } catch (err) {
+      setError("Erreur lors de la connexion avec Google");
+      setIsLoading(false);
     }
   };
 
@@ -97,35 +107,74 @@ export default function Modal({ isOpen, closeModal }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/80">
-      <div className="p-6 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-lg shadow-xl w-96">
-        <h2 className="mb-4 text-xl font-bold text-center">
-          {isSignUp ? "Inscription" : "Connexion"}
+      <div className="relative p-8 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 rounded-2xl shadow-xl w-[420px]">
+        {/* Bouton de fermeture */}
+        <button
+          onClick={closeModal}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+        >
+          <i className="bx bx-x text-2xl"></i>
+        </button>
+
+        <h2 className="mb-6 text-2xl font-bold text-center">
+          {isSignUp ? "Créer un compte" : "Se connecter"}
         </h2>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <div className="space-y-4 mb-6">
+          <button
+            onClick={handleGoogleSignIn}
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <i className="fab fa-google text-xl"></i>
+            Continuer avec Google
+          </button>
+        </div>
+
+        <div className="relative mb-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-300 dark:border-gray-700"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white dark:bg-gray-900 text-gray-500">
+              ou
+            </span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {isSignUp && (
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Nom complet"
-              required
-              className="px-3 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400"
-            />
+            <div className="relative">
+              <i className="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Nom complet"
+                required
+                disabled={isLoading}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF4545] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+            </div>
           )}
 
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Email"
-            required
-            className="px-3 py-2 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400"
-          />
+          <div className="relative">
+            <i className="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="Email"
+              required
+              disabled={isLoading}
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF4545] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+          </div>
 
           <div className="relative">
+            <i className="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
             <input
               type={showPassword ? "text" : "password"}
               name="password"
@@ -133,47 +182,59 @@ export default function Modal({ isOpen, closeModal }) {
               onChange={handleChange}
               placeholder="Mot de passe"
               required
-              className="w-full px-3 py-2 pr-10 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400"
+              disabled={isLoading}
+              className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF4545] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute text-gray-500 dark:text-gray-300 right-2 top-2"
+              disabled={isLoading}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
             >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              <i
+                className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
+              ></i>
             </button>
           </div>
 
           {error && (
-            <div className="p-2 text-sm text-red-600 bg-red-100 dark:bg-red-800 dark:text-red-200 rounded">
+            <div className="p-3 text-sm text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-200 rounded-lg">
               {error}
             </div>
           )}
 
           <button
             type="submit"
-            className="py-2 text-white bg-green-600 rounded hover:bg-green-700"
+            disabled={isLoading}
+            className="py-3 text-white bg-[#FF4545] rounded-lg hover:bg-[#E03E3E] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSignUp ? "S'inscrire" : "Se connecter"}
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <i className="fas fa-spinner fa-spin"></i>
+                Chargement...
+              </span>
+            ) : isSignUp ? (
+              "S'inscrire"
+            ) : (
+              "Se connecter"
+            )}
           </button>
         </form>
 
-        <p className="mt-4 text-sm text-center">
-          {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}{" "}
+        <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+          {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}
           <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-blue-600 dark:text-blue-400 underline"
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setError("");
+              setForm({ name: "", email: "", password: "" });
+            }}
+            disabled={isLoading}
+            className="ml-1 text-[#FF4545] hover:text-[#E03E3E] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSignUp ? "Connexion" : "Inscription"}
+            {isSignUp ? "Se connecter" : "S'inscrire"}
           </button>
-        </p>
-
-        <button
-          onClick={closeModal}
-          className="block mx-auto mt-4 text-sm text-gray-500 dark:text-gray-300 underline"
-        >
-          Fermer
-        </button>
+        </div>
       </div>
     </div>
   );
@@ -190,7 +251,7 @@ Ce modal gère l'authentification avec le flux suivant :
 
 2. Lors de la connexion :
    - Vérifie les identifiants avec NextAuth
-   - Si valides : redirige vers /dashboard
+   - Si valides : redirige vers /profil
    - Si invalides : affiche message d'erreur
 
 Le stockage en base de données se fait uniquement à l'inscription.
@@ -200,5 +261,5 @@ Flux technique inscription -> connexion :
 1. POST /api/auth/signup (stockage MongoDB)
 2. Retour au formulaire connexion
 3. Authentification via NextAuth
-4. Redirection dashboard
+4. Redirection profil
 */

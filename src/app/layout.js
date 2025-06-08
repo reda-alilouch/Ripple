@@ -1,8 +1,12 @@
+import { Inter } from "next/font/google";
 import "./global.css";
+import AuthProvider from "@/components/AuthProvider";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Ripple - Votre Musique",
-  description: "Écoutez votre musique préférée sur Ripple",
+  title: "Ripple",
+  description: "Ripple - Your Music Companion",
 };
 
 export default function RootLayout({ children }) {
@@ -21,7 +25,9 @@ export default function RootLayout({ children }) {
           referrerPolicy="no-referrer"
         />
       </head>
-      <body className="bg-white dark:bg-slate-900">{children}</body>
+      <body className={`${inter.className} bg-white dark:bg-slate-900`}>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }
