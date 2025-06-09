@@ -1,13 +1,14 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useSession, signOut } from "next-auth/react";
 import Button from "@/components/Button";
 import Modal from "@/components/Modal/Modal";
 import Link from "next/link";
 
 export default function Connexion() {
   const [isOpen, setIsOpen] = useState(false);
-  const { data: session, status } = useSession();
+  const [session, setSession] = useState(null);
+  const [status, setStatus] = useState("loading");
   const [showDropdown, setShowDropdown] = useState(false);
 
   const openModal = () => setIsOpen(true);
@@ -16,10 +17,33 @@ export default function Connexion() {
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
   const handleSignOut = async () => {
-    await signOut({ redirect: true, callbackUrl: "/" });
+    try {
+      await fetch("/api/auth/signout", { method: "POST" }); // Route personnalisée pour déconnexion
+      setSession(null); // Effacer la session côté client
+      window.location.href = "/"; // Rediriger vers la page d'accueil
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion :", error);
+    }
   };
 
   useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const res = await fetch("/api/auth/session");
+        if (res.ok) {
+          const data = await res.json();
+          setSession(data);
+          setStatus("authenticated");
+        } else {
+          setStatus("unauthenticated");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération de la session :", error);
+        setStatus("unauthenticated");
+      }
+    };
+    fetchSession();
+
     const handleClickOutside = (event) => {
       if (showDropdown && !event.target.closest(".profile-dropdown")) {
         setShowDropdown(false);
@@ -53,8 +77,6 @@ export default function Connexion() {
 
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
-              
-
               <Link
                 href="/profil"
                 className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"

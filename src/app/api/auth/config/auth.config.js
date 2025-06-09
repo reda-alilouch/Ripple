@@ -1,48 +1,25 @@
-import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import { clientPromise } from "@/lib/mongodb";
+// src/app/api/auth/config/auth.config.js
 import { authProviders } from "@/lib/auth-providers";
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import clientPromise from "@/lib/mongodb";
 
 export const authConfig = {
+  providers: authProviders,
   adapter: MongoDBAdapter(clientPromise),
-  providers: [authProviders.google(), authProviders.credentials()],
-  pages: {
-    signIn: "/",
-    error: "/",
-    newUser: "/profil",
-  },
   callbacks: {
-    async signIn({ user, account, profile }) {
-      return true;
-    },
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith(baseUrl)) return url;
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      return `${baseUrl}/profil`;
-    },
-    async session({ session, token }) {
-      if (token?.sub) {
-        session.user.id = token.sub;
-      }
-      if (token?.provider) {
-        session.user.provider = token.provider;
-      }
-      return session;
-    },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
-        token.sub = user.id;
-      }
-      if (account) {
-        token.provider = account.provider;
+        token.id = user.id;
+        token.email = user.email;
       }
       return token;
     },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.email = token.email;
+      }
+      return session;
+    },
   },
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 jours
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === "development",
-  useSecureCookies: process.env.NODE_ENV === "production",
 };

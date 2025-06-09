@@ -1,58 +1,44 @@
+// src/app/api/auth/signin/route.js
 import { NextResponse } from "next/server";
-import { connectMongoDB } from "@/lib/mongodb";
-import User from "@/models/users";
-import { comparePassword } from "@/lib/auth";
+import clientPromise from "@/lib/mongodb";
+import { compare } from "bcryptjs";
+import { generateToken } from "@/lib/auth";
 
 export async function POST(request) {
   try {
     const { email, password } = await request.json();
+    const client = await clientPromise;
+    const db = client.db();
 
-    // Validation des données
-    if (!email || !password) {
+    const user = await db.collection("users").findOne({ email });
+    if (!user || !(await compare(password, user.password))) {
       return NextResponse.json(
-        { success: false, error: "Email et mot de passe requis" },
-        { status: 400 }
-      );
-    }
-
-    // Connexion à MongoDB
-    await connectMongoDB();
-
-    // Trouver l'utilisateur
-    const user = await User.findOne({ email, provider: "credentials" });
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Identifiants invalides" },
+        { success: false, error: "Email ou mot de passe incorrect" },
         { status: 401 }
       );
     }
 
-    // Vérifier le mot de passe
-    const isValidPassword = await comparePassword(password, user.password);
-    if (!isValidPassword) {
-      return NextResponse.json(
-        { success: false, error: "Identifiants invalides" },
-        { status: 401 }
-      );
-    }
+    const token = generateToken({
+      userId: user._id,
+      email: user.email,
+      name: user.name,
+    });
 
-    // Réponse sans le mot de passe
     const userResponse = {
-      id: user._id.toString(),
+      id: user._id,
       name: user.name,
       email: user.email,
-      provider: user.provider,
+      spotifyConnected: user.spotifyConnected,
     };
 
-    return NextResponse.json({
-      success: true,
-      message: "Connexion réussie",
-      user: userResponse,
-    });
-  } catch (error) {
-    console.error("Erreur signin:", error);
     return NextResponse.json(
-      { success: false, error: "Erreur interne du serveur" },
+      { success: true, user: userResponse, token },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Erreur signin:", error.message);
+    return NextResponse.json(
+      { success: false, error: "Erreur interne du serveur", details: error.message },
       { status: 500 }
     );
   }

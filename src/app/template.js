@@ -1,5 +1,5 @@
+// src/app/template.js
 "use client";
-
 import Header from "@/features/Header/Header";
 import Aside from "@/features/Aside";
 import Footer from "@/features/Footer/Footer";

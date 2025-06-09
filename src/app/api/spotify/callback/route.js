@@ -1,3 +1,5 @@
+import "server-only"; // Ajoute une protection pour server-only
+
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";

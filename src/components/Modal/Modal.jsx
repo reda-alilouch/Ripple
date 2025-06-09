@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
@@ -16,18 +15,6 @@ const handleError = (error, context) => {
   return (
     error.response?.data?.error || error.message || "Une erreur est survenue"
   );
-};
-
-// Fonction pour se connecter à MongoDB
-const ensureMongoConnection = async () => {
-  try {
-    await connectMongoDB();
-    logAction("MongoDB Connection", "Successfully connected");
-    return true;
-  } catch (error) {
-    console.error("[MongoDB Connection Error]:", error);
-    return false;
-  }
 };
 
 export default function Modal({ isOpen, closeModal }) {
@@ -54,35 +41,21 @@ export default function Modal({ isOpen, closeModal }) {
         // Inscription
         const res = await axios.post("/api/auth/signup", form);
         if (res.data.success) {
-          // Si l'inscription réussit, connecter automatiquement
-          const signInResult = await signIn("credentials", {
-            email: form.email,
-            password: form.password,
-            redirect: false,
-          });
-
-          if (signInResult?.error) {
-            setError(
-              "Inscription réussie, mais erreur lors de la connexion automatique"
-            );
-          } else {
-            router.refresh();
-            closeModal();
-          }
+          // Après inscription réussie, rediriger vers la connexion
+          router.push("/api/auth/signin?email=" + encodeURIComponent(form.email));
+          closeModal();
         }
       } else {
         // Connexion
-        const result = await signIn("credentials", {
+        const res = await axios.post("/api/auth/signin", {
           email: form.email,
           password: form.password,
-          redirect: false,
         });
-
-        if (result?.error) {
-          setError("Email ou mot de passe incorrect");
-        } else {
-          router.refresh();
+        if (res.data.success) {
+          router.refresh(); // Rafraîchir la session côté client
           closeModal();
+        } else {
+          setError("Email ou mot de passe incorrect");
         }
       }
     } catch (err) {
@@ -96,7 +69,8 @@ export default function Modal({ isOpen, closeModal }) {
     setError("");
     setIsLoading(true);
     try {
-      await signIn("google", { callbackUrl: "/profil" });
+      // Utiliser la redirection manuelle avec @auth/core
+      window.location.href = "/api/auth/signin/google?callbackUrl=/profil";
     } catch (err) {
       setError("Erreur lors de la connexion avec Google");
       setIsLoading(false);

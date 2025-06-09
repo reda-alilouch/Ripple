@@ -1,3 +1,4 @@
+// src/app/page.js
 "use client";
 import Carousel from "@/components/Carousel";
 import Titre from "@/components/Card/Titre/Titre";
