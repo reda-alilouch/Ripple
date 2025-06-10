@@ -8,7 +8,7 @@ export const authConfig = {
   pages: {
     signIn: "/",
     error: "/",
-    newUser: "/profil",
+    newUser: "/",
   },
   callbacks: {
     async signIn({ user, account, profile }) {
