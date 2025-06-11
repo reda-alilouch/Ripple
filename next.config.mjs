@@ -13,6 +13,12 @@ const nextConfig = {
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   },
   webpack: (config) => {
+    config.resolve.fallback = {
+      fs: false,
+      child_process: false,
+      net: false,
+      tls: false,
+    };
     config.resolve.alias = {
       ...config.resolve.alias,
       "@": "./src",
