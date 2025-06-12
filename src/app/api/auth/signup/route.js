@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import connectMongoDB from "@/lib/mongodb";
-import { hashPassword, generateToken } from "@/lib/auth";
+import { hashPassword } from "@/lib/auth";
+import User from "@/models/users";
 
 export async function POST(request) {
   try {
+    console.log("Début de la requête d'inscription");
     const { email, password, name } = await request.json();
+    console.log("Données reçues:", { email, name });
 
     // Validation des données
     if (!email || !password || !name) {
+      console.log("Champs manquants");
       return NextResponse.json(
         { success: false, error: "Tous les champs sont requis" },
         { status: 400 }
@@ -15,6 +19,7 @@ export async function POST(request) {
     }
 
     if (password.length < 6) {
+      console.log("Mot de passe trop court");
       return NextResponse.json(
         {
           success: false,
@@ -24,105 +29,52 @@ export async function POST(request) {
       );
     }
 
-    const client = await connectMongoDB();
-    const db = client.db(process.env.MONGODB_DB);
+    console.log("Connexion à MongoDB...");
+    await connectMongoDB();
+    console.log("Connecté à MongoDB");
 
     // Vérifier si l'utilisateur existe déjà
-    const existingUser = await db.collection("users").findOne({ email });
+    console.log("Vérification de l'existence de l'utilisateur...");
+    const existingUser = await User.findOne({
+      email: email.toLowerCase().trim(),
+    });
+
     if (existingUser) {
+      console.log("Utilisateur existe déjà");
       return NextResponse.json(
         { success: false, error: "Un utilisateur avec cet email existe déjà" },
         { status: 409 }
       );
     }
 
-    // Hasher le mot de passe
+    console.log("Hachage du mot de passe...");
     const hashedPassword = await hashPassword(password);
 
-    // Créer l'utilisateur
-    const user = {
+    console.log("Création de l'utilisateur...");
+    const user = new User({
       name,
-      email,
+      email: email.toLowerCase().trim(),
       password: hashedPassword,
-      spotifyConnected: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    const result = await db.collection("users").insertOne(user);
-
-    // Générer le token JWT
-    const token = generateToken({
-      userId: result.insertedId,
-      email: user.email,
-      name: user.name,
+      provider: "credentials",
+      emailVerified: new Date(),
     });
 
-    // Réponse sans le mot de passe
-    const userResponse = {
-      id: result.insertedId,
-      name: user.name,
-      email: user.email,
-      spotifyConnected: user.spotifyConnected,
-    };
+    console.log("Sauvegarde de l'utilisateur...");
+    await user.save();
+    console.log("Utilisateur créé avec succès");
 
     return NextResponse.json(
-      {
-        success: true,
-        message: "Compte créé avec succès",
-        user: userResponse,
-        token,
-      },
+      { success: true, message: "Compte créé avec succès" },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Erreur signup:", error);
+    console.error("Erreur lors de l'inscription:", error);
     return NextResponse.json(
-      { success: false, error: "Erreur interne du serveur" },
+      {
+        success: false,
+        error: error.message || "Une erreur est survenue lors de l'inscription",
+      },
       { status: 500 }
     );
   }
 }
-/*
-Dans MongoDB, ce code effectue les opérations suivantes :
-
-1. Connexion à la base de données :
-   - Utilise la fonction connectMongoDB() pour établir la connexion
-   - Vérifie l'état de la connexion avant les opérations
-   - Utilise l'URI MongoDB stocké dans les variables d'environnement
-
-2. Collection "users" :
-   - Structure du document utilisateur :
-     {
-       _id: ObjectId (généré automatiquement),
-       name: String,
-       email: String (unique),
-       password: String (hashé),
-       spotifyConnected: Boolean,
-       createdAt: Date,
-       updatedAt: Date
-     }
-
-3. Opérations effectuées :
-   - Recherche par email pour vérifier les doublons :
-     db.collection("users").findOne({ email })
-   
-   - Insertion nouvel utilisateur :
-     db.collection("users").insertOne({
-       name,
-       email,
-       password: hashedPassword,
-       spotifyConnected: false,
-       createdAt: new Date(),
-       updatedAt: new Date()
-     })
-
-4. Indexes recommandés :
-   - Index unique sur email
-   - Index sur createdAt pour les requêtes temporelles
-
-5. Bonnes pratiques :
-   - Validation des données avant insertion
-   - Gestion des erreurs MongoDB
-   - Nettoyage des données sensibles avant envoi
-*/
