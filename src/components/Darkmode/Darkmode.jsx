@@ -25,10 +25,10 @@ const Darkmode = () => {
       />
       <label
         htmlFor="checkbox"
-        className="checkbox-label border px-3 rounded-3xl w-20 h-8 xl:w-24 xl:h-10 hover:shadow dark:hover:shadow-customdark"
+        className="px-3 w-20 h-8 rounded-3xl border checkbox-label xl:w-24 xl:h-10 hover:shadow dark:hover:shadow-customdark"
       >
-        <i className="fa fa-moon dark:text-white"></i>
-        <i className="fa fa-sun dark:text-white"></i>
+        <i className="text-black fa fa-moon dark:text-white"></i>
+        <i className="text-black fa fa-sun dark:text-white"></i>
         <span className="ball"></span>
       </label>
     </div>
