@@ -32,7 +32,7 @@ export default function Template({ children }) {
       <Header onToggleSidebar={toggleSidebar} />
       <div className="xl:flex">
         <Aside isOpen={isSidebarOpen} />
-        <main className="main" id="main">
+        <main className="main w-full" id="main">
           {children}
           <Footer />
         </main>
