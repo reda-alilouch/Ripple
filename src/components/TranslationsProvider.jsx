@@ -2,7 +2,6 @@
 
 import { I18nextProvider } from "react-i18next";
 import initI18next from "@/lib/i18n";
-import { createInstance } from "i18next";
 import { useEffect, useState } from "react";
 
 export default function TranslationsProvider({ children, locale, namespaces }) {
@@ -10,17 +9,15 @@ export default function TranslationsProvider({ children, locale, namespaces }) {
 
   useEffect(() => {
     const init = async () => {
-      if (!i18n) {
-        const newInstance = createInstance();
-        await initI18next(locale, namespaces, newInstance);
-        setI18n(newInstance);
-      }
+      const newInstance = await initI18next(locale, namespaces);
+      setI18n(newInstance);
     };
+
     init();
-  }, [locale, namespaces, i18n]);
+  }, [locale, namespaces]);
 
   if (!i18n) {
-    return null; // ou un loader
+    return null; // Ou un composant de chargement
   }
 
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
