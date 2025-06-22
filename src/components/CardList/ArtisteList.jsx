@@ -30,9 +30,12 @@ export default function ListArtiste() {
       <div className="head flex justify-between items-center mb-5">
         <h2 className="top font-bold">Top artistes</h2>
         <div className="voir-plus">
-          <a href="#">
-            <span className="#">voir plus</span>
-            <i className="fa-solid fa-arrow-right arrow-rotation"></i>
+          <a
+            href="/Artistes"
+            className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
+          >
+            <span>Voir plus</span>
+            <i className="fa-solid fa-arrow-right"></i>
           </a>
         </div>
       </div>

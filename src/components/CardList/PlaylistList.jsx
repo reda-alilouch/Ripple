@@ -10,7 +10,9 @@ const PlaylistList = () => {
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
-        const response = await fetch("/api/spotify/search?q=top%20playlist&type=playlist&limit=6");
+        const response = await fetch(
+          "/api/spotify/search?q=top%20playlist&type=playlist&limit=6"
+        );
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des playlists");
         }
@@ -38,13 +40,7 @@ const PlaylistList = () => {
   }
 
   if (error) {
-    return (
-      <section className="section container px-5 pt-5 pb-5">
-        <div className="text-red-500 text-center">
-          Erreur: {error}
-        </div>
-      </section>
-    );
+    console.error("Erreur:", error);
   }
 
   return (
@@ -52,13 +48,19 @@ const PlaylistList = () => {
       <div className="head flex justify-between items-center mb-5">
         <h2 className="top font-bold text-2xl">Top playlists</h2>
         <div className="voir-plus">
-          <a href="#" className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors">
+          <a
+            href="/Playlistes"
+            className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
+          >
             <span>Voir plus</span>
             <i className="fa-solid fa-arrow-right"></i>
           </a>
         </div>
       </div>
-      <div id="cards-container" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+      <div
+        id="cards-container"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6"
+      >
         {playlists.length === 0 ? (
           <p className="px-5 text-gray-500">Aucune playlist trouvée.</p>
         ) : (

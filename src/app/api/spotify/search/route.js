@@ -38,7 +38,7 @@ export async function GET(req) {
     }
     
     // Obtenir le token d'accès
-    const { access_token } = await getAccessToken();
+    const access_token = await getAccessToken();
     
     if (!access_token) {
       console.error('Échec de l\'obtention du token d\'accès');
