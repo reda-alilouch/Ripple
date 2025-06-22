@@ -31,11 +31,11 @@ const displayAsides = AsidesArray.map((item) => (
 const Aside = ({ isOpen }) => {
   return (
     <aside
-      className={`${styles.aside} aside hidden xl:flex xl:w-1/20 transition-colors duration-1000 dark:bg-slate-900 dark:text-white`}
+      className={`${styles.aside} aside hidden xl:flex xl:w-1/20 text-black transition-colors duration-1000 dark:bg-slate-900 dark:text-white`}
       id="aside"
     >
       <div className="xl:fixed xl:z-50 xl:left-0 xl:top-16">
-        <ul className="aside-nav p-4">{displayAsides}</ul>
+        <ul className="p-4 aside-nav">{displayAsides}</ul>
       </div>
     </aside>
   );

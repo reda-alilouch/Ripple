@@ -29,9 +29,12 @@ export default function ListAlbum() {
       <div className="head flex justify-between items-center">
         <h2 className="top font-bold">Top albums</h2>
         <div className="voir-plus flex">
-          <a href="#">
-            <span className="voir">voir plus</span>
-            <i className="fa-solid fa-arrow-right arrow-rotation"></i>
+          <a
+            href="/Albums"
+            className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
+          >
+            <span>Voir plus</span>
+            <i className="fa-solid fa-arrow-right"></i>
           </a>
         </div>
       </div>

@@ -1,51 +1,176 @@
-// src/components/Card/Titre/Titre.jsx
 "use client";
+import { useState } from 'react';
+import axios from 'axios';
+import styles from "./Titre.module.css";
 import Icon from "@/components/Icon";
 
+// Fonction utilitaire pour formater la durée en millisecondes en MM:SS
+const formatDuration = (ms) => {
+  if (!ms) return '--:--';
+  const minutes = Math.floor(ms / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
+
 const Titre = ({ track, className = "" }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audio, setAudio] = useState(null);
+  const [hasError, setHasError] = useState(false);
+
+  // Vérifier que la piste est valide
+  if (!track || !track.id || !track.name) {
+    console.warn("Piste invalide dans le composant Titre:", track);
+    return null;
+  }
+
+  const handlePlay = async (e) => {
+    e.preventDefault();
+    
+    if (isPlaying && audio) {
+      audio.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    if (track.preview_url) {
+      try {
+        // Arrêter tout autre son en cours
+        if (audio) {
+          audio.pause();
+          setAudio(null);
+        }
+        
+        // Créer un nouvel objet audio
+        const newAudio = new Audio(track.preview_url);
+        
+        newAudio.onplay = () => setIsPlaying(true);
+        newAudio.onended = () => setIsPlaying(false);
+        newAudio.onpause = () => setIsPlaying(false);
+        
+        setAudio(newAudio);
+        await newAudio.play();
+      } catch (err) {
+        console.error("Erreur de lecture:", err);
+      }
+    }
+  };
+
+  const handleAddToPlaylist = (e) => {
+    e.preventDefault();
+    console.log("Ajout à la playlist:", track.name);
+    // Ici vous pourriez ajouter la logique pour ajouter à une playlist
+  };
+
+  const handleArtistClick = (e) => {
+    e.preventDefault();
+    // Redirection vers la page de l'artiste si nécessaire
+    console.log("Voir l'artiste:", track.artists);
+  };
+
+  const handleTrackClick = (e) => {
+    e.preventDefault();
+    if (track.external_url) {
+      window.open(track.external_url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
-    <div
-      className={`track-card flex items-center gap-4 p-3 hover:bg-gray-100 rounded-lg ${className}`}
-    >
-      <div className="relative w-12 h-12 track-image">
-        <img
-          src={track?.album?.images?.[0]?.url || "/placeholder-track.jpg"}
-          alt={track?.name || "Track cover"}
-          className="object-cover w-full h-full rounded"
-        />
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 play-button hover:opacity-100">
-          <Icon lib="fa-solid" name="fa-play" className="text-white" />
+    <div className={`mr-5 mt-5 ms-5 pr-5 w-full ${className}`}>
+      <div className={`${styles.titre} titre`}>
+        <div className="img-h3 w-full flex items-center">
+          <a 
+            href="#" 
+            onClick={handlePlay}
+            className="relative group"
+            title={track.preview_url ? "Écouter un extrait" : "Aperçu non disponible"}
+          >
+            <div className="relative w-16 h-16 flex-shrink-0">
+              <img
+                className="img-titre rounded-md object-cover w-full h-full"
+                src={track.image}
+                alt={`Pochette de ${track.name}`}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = '/default-album.jpg';
+                }}
+                onLoad={() => setHasError(false)}
+              />
+              {track.preview_url && (
+                <button
+                  onClick={handlePlay}
+                  className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md transition-opacity ${
+                    isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}
+                  aria-label={isPlaying ? 'Mettre en pause' : 'Lire un extrait'}
+                >
+                  <Icon 
+                    lib="fa-solid" 
+                    name={isPlaying ? 'fa-pause' : 'fa-play'} 
+                    className="text-white text-xl" 
+                  />
+                </button>
+              )}
+            </div>
+          </a>
+          <div className="h3 pl-4 flex-1 min-w-0">
+            <a 
+              href="#" 
+              onClick={handleTrackClick}
+              className="block hover:underline truncate"
+              title={track.name}
+            >
+              <h3 className="font-medium truncate">{track.name}</h3>
+            </a>
+            <div className="text-sm text-gray-500 truncate">
+              {Array.isArray(track.artists) && track.artists.length > 0 ? (
+                track.artists.map((artist, index, array) => {
+                  if (!artist || !artist.name) return null;
+                  
+                  return (
+                    <span key={artist.id || `artist-${index}`}>
+                      <a 
+                        href={`#`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (artist.id) {
+                            window.open(
+                              `https://open.spotify.com/artist/${artist.id}`, 
+                              '_blank', 
+                              'noopener,noreferrer'
+                            );
+                          }
+                        }}
+                        className="hover:underline hover:text-white transition-colors"
+                        title={artist.name}
+                        onError={() => setHasError(true)}
+                      >
+                        {artist.name}
+                      </a>
+                      {index < array.length - 1 ? ', ' : ''}
+                    </span>
+                  );
+                })
+              ) : (
+                <span className="text-gray-400">Artiste inconnu</span>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="flex-1 track-info">
-        <h3 className="font-medium track-title">
-          {track?.name || "Track Title"}
-        </h3>
-        <p className="text-sm text-gray-600 track-artist">
-          {track?.artists?.[0]?.name || "Artist Name"}
-        </p>
-      </div>
-      <div className="text-sm text-gray-600 track-duration">
-        {track?.duration_ms
-          ? Math.floor(track.duration_ms / 1000 / 60) +
-            ":" +
-            String(Math.floor((track.duration_ms / 1000) % 60)).padStart(2, "0")
-          : "0:00"}
+        <div className="icon-time flex items-center gap-4">
+          <span className="text-sm text-gray-500">
+            {formatDuration(track.duration_ms)}
+          </span>
+          <button 
+            onClick={handleAddToPlaylist}
+            className="text-gray-400 hover:text-white transition-colors"
+            title="Ajouter à une playlist"
+          >
+            <Icon lib="fa-regular" name="fa-heart" className="text-lg" />
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Titre;
-
-const dev = {
-  name: "ALILOUCH Reda",
-  stack: ["React", "PHP", "MongoDB", "Next.js"],
-  strengths: [
-    "Résolution de problèmes",
-    "Apprentissage rapide",
-    "Créativité",
-    "Travail en équipe",
-  ],
-  mission: "Créer des expériences web puissantes",
-};
