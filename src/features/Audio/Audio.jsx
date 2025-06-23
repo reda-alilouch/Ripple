@@ -5,10 +5,16 @@ import Image from "next/image";
 
 const Audio = () => (
   <div
-    className={`${styles.audio} audio bottom-0 left-0 w-full z-20 fixed flex justify-between items-center py-5 px-3 bg-white transition-colors duration-1000 dark:bg-slate-900 dark:text-white`}
+    className={`${styles.audio} audio bottom-0 left-0 w-full z-20 fixed flex justify-between items-center px-3 bg-white transition-colors duration-1000 dark:bg-slate-900 dark:text-white`}
   >
     <div className="flex items-center gap-3">
-    <Image src="/images/audio.png" alt="audio" className="rounded-md object-cover" width={70} height={70} />
+      <Image
+        src="/images/audio.png"
+        alt="audio"
+        className="rounded-md object-cover"
+        width={70}
+        height={70}
+      />
 
       <div className="nom">
         <h3 className="mb-1">nom titre</h3>

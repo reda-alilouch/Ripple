@@ -1,33 +1,58 @@
 import { getServerSession } from "next-auth/next";
+import { connectMongoDB } from "@/lib/mongodb";
+import User from "@/models/users";
+
 export default async function Profil() {
-  // Récupérer la session côté serveur
   const session = await getServerSession();
 
-  let userData = null;
-  if (session?.provider === "google") {
-    // Configurer les credentials pour Google People API
-    const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: session.accessToken });
-    const people = google.people({ version: "v1", auth });
-    const { data } = await people.people.get({
-      resourceName: "people/me",
-      personFields: "names,emailAddresses",
-    });
-    userData = data;
-  } else if (session?.provider === "custom") {
-    // Récupérer les données utilisateur depuis MongoDB
-    const { MongoClient } = require("mongodb");
-    const client = new MongoClient(process.env.MONGODB_URI);
-    await client.connect();
-    const db = client.db("your-db");
-    userData = await db.collection("users").findOne({ email: session.email });
-    await client.close();
+  if (!session) {
+    return (
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold">Profil</h1>
+        <p>Vous devez être connecté pour voir cette page.</p>
+      </div>
+    );
+  }
+
+  let userData = {};
+
+  try {
+    if (session.user?.email) {
+      await connectMongoDB();
+      const userFromDb = await User.findOne({ email: session.user.email })
+        .lean()
+        .exec();
+
+      if (userFromDb) {
+        // Exclure le mot de passe pour la sécurité
+        const { password, ...userSafeData } = userFromDb;
+        userData = { ...session.user, ...userSafeData };
+      } else {
+        // Si l'utilisateur (ex: Google) n'est pas dans notre BDD, on utilise les infos de la session
+        userData = session.user;
+      }
+    } else {
+      userData = session.user;
+    }
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des données utilisateur:",
+      error
+    );
+    userData = {
+      ...session.user,
+      error: "Impossible de charger les données complètes du profil.",
+    };
   }
 
   return (
-    <div>
-      <h1>Profil</h1>
-      <pre>{JSON.stringify(userData, null, 2)}</pre>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Profil</h1>
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+        <pre className="whitespace-pre-wrap break-all">
+          {JSON.stringify(userData, null, 2)}
+        </pre>
+      </div>
     </div>
   );
 }
