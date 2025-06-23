@@ -24,11 +24,11 @@ export default function TemplateClient({ children }) {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen transition-colors duration-1000 dark:bg-slate-900 dark:text-white">
+    <div className="w-full min-h-screen duration-1000 wtransition-colors dark:bg-slate-900 dark:text-white">
       <Header onToggleSidebar={toggleSidebar} />
       <div className="xl:flex">
         <Aside isOpen={isSidebarOpen} locale={locale} />
-        <main className="main w-full" id="main">
+        <main className="w-full main" id="main">
           {children}
           <Footer />
         </main>
