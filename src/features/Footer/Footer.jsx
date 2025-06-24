@@ -29,7 +29,7 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="w-full bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-[#232946] pt-8 pb-24 px-4">
+    <footer className="w-full bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-[#232946] pt-8 px-4">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
         {/* About */}
         <div className="flex-1 min-w-[200px]">

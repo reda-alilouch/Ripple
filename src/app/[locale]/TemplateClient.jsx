@@ -28,7 +28,7 @@ export default function TemplateClient({ children }) {
       <Header onToggleSidebar={toggleSidebar} />
       <div className="xl:flex">
         <Aside isOpen={isSidebarOpen} locale={locale} />
-        <main className="w-full main" id="main">
+        <main className="w-full main py-24" id="main">
           {children}
           <Footer />
         </main>

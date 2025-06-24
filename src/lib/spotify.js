@@ -212,26 +212,39 @@ export const getSpotifyPlaylists = async () => {
   let allPlaylists = [];
   let limit = 50;
 
-  // Récupérer 100 playlists (2 pages de 50)
-  for (let offset = 0; offset < 500; offset += limit) {
+  for (let offset = 0; offset < 100; offset += limit) {
     const response = await axios.get(
-      `https://api.spotify.com/v1/browse/categories/toplists/playlists?country=FR&limit=${limit}&offset=${offset}`,
+      `https://api.spotify.com/v1/search?q=top%20playlist&type=playlist&limit=${limit}&offset=${offset}&market=FR`,
       {
         headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
-    allPlaylists = allPlaylists.concat(response.data.playlists.items);
 
-    // Stop si moins de 50 résultats (fin de la pagination)
-    if (response.data.playlists.items.length < limit) break;
+    // Sécurité : vérifier la présence de playlists
+    if (
+      response.data &&
+      response.data.playlists &&
+      Array.isArray(response.data.playlists.items)
+    ) {
+      allPlaylists = allPlaylists.concat(response.data.playlists.items);
+
+      // Stop si moins de 50 résultats (fin de la pagination)
+      if (response.data.playlists.items.length < limit) break;
+    } else {
+      // Affiche la réponse brute pour debug
+      console.log("Réponse inattendue de l'API Spotify:", response.data);
+      break;
+    }
   }
 
-  return allPlaylists.map((playlist) => ({
-    spotifyId: playlist.id,
-    name: playlist.name,
-    description: playlist.description,
-    owner: playlist.owner.display_name,
-    tracks: [], // Pour simplifier, on ne récupère pas les tracks ici
-    image: playlist.images[0]?.url || "",
-  }));
+  return allPlaylists
+    .filter((playlist) => playlist !== null && playlist !== undefined)
+    .map((playlist) => ({
+      spotifyId: playlist.id,
+      name: playlist.name,
+      description: playlist.description || "",
+      owner: playlist.owner?.display_name || "",
+      tracks: [], // Tableau vide pour éviter les erreurs de type
+      image: playlist.images?.[0]?.url || "",
+    }));
 };
