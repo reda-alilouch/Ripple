@@ -1,34 +1,41 @@
 "use client";
-import Splide from "@splidejs/splide";
-import "@splidejs/splide/dist/css/splide.min.css";
+import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import Image from "next/image";
-
-const carouselItems = [
-  {
-    id: 1,
-    title: "Découvrez de nouvelles musiques",
-    description: "Explorez notre vaste collection de titres",
-  },
-  {
-    id: 2,
-    title: "Créez vos playlists",
-    description: "Organisez votre musique comme vous le souhaitez",
-  },
-  {
-    id: 3,
-    title: "Écoutez partout",
-    description: "Profitez de votre musique où que vous soyez",
-  },
-];
+import Splide from "@splidejs/splide";
+import "@splidejs/splide/dist/css/splide.min.css";
 
 function Carousel() {
+  const [banners, setBanners] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/banner")
+      .then((res) => res.json())
+      .then(setBanners);
+  }, []);
+
+  useEffect(() => {
+    if (banners.length > 0) {
+      new Splide("#splide", {
+        type: "loop",
+        perPage: 1,
+        autoplay: true,
+      }).mount();
+    }
+  }, [banners]);
+
   return (
     <div className="splide" id="splide">
       <div className="splide__track">
         <ul className="splide__list">
-          {carouselItems.map((item) => (
-            <li key={item.id} className="splide__slide relative h-[300px]">
+          {banners.map((item) => (
+            <li key={item._id} className="splide__slide relative h-[300px]">
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                className="object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary/20">
                 <div className="relative z-10 flex flex-col items-center justify-center h-full text-white p-4">
                   <h2 className="text-3xl font-bold mb-2">{item.title}</h2>

@@ -1,26 +1,30 @@
-import { createInstance } from "i18next";
-import { initReactI18next } from "react-i18next/initReactI18next";
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
 import HttpBackend from "i18next-http-backend";
 
-const initI18next = async (lng = "fr", ns = "common") => {
-  const i18nInstance = createInstance();
-  await i18nInstance
-    .use(initReactI18next)
+// Cette configuration est pour le CLIENT UNIQUEMENT
+// Elle est initialisée une seule fois
+if (!i18n.isInitialized) {
+  i18n
     .use(HttpBackend)
+    .use(initReactI18next)
     .init({
-      lng,
-      ns,
-      defaultNS: "common",
+      // lng est détecté par le middleware, mais on met un fallback
+      lng: "fr",
       fallbackLng: "fr",
+      supportedLngs: ["fr", "en"],
+      ns: ["common", "auth", "messages", "footer"],
+      defaultNS: "common",
       backend: {
-        // Chemin vers votre API de traduction
-        loadPath: `${process.env.NEXT_PUBLIC_APP_URL}/api/translations/{{lng}}/{{ns}}`,
+        loadPath: "/api/translations/{{lng}}/{{ns}}",
       },
       react: {
         useSuspense: false,
       },
+      interpolation: {
+        escapeValue: false, // React gère déjà l'échappement
+      },
     });
-  return i18nInstance;
-};
+}
 
-export default initI18next;
+export default i18n;

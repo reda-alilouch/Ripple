@@ -1,8 +1,8 @@
 import { Inter } from "next/font/google";
 import "./global.css";
 import AuthProvider from "@/components/AuthProvider";
-import TranslationsProvider from "@/components/TranslationsProvider";
-import initI18next from "@/lib/i18n";
+import ClientI18nProvider from "@/components/ClientI18nProvider";
+import ThemeProvider from "@/components/ThemeProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,13 +11,9 @@ export const metadata = {
   description: "Ripple - Your Music Companion",
 };
 
-const i18nNamespaces = ["common", "auth", "messages", "footer"];
-
-export default async function RootLayout({ children, params: { locale } }) {
-  const i18n = await initI18next(locale, i18nNamespaces);
-
+export default function RootLayout({ children }) {
   return (
-    <html lang={i18n.language}>
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <link
           href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
@@ -32,12 +28,11 @@ export default async function RootLayout({ children, params: { locale } }) {
         />
       </head>
       <body className={`${inter.className} bg-white dark:bg-slate-900`}>
-        <TranslationsProvider
-          namespaces={i18nNamespaces}
-          locale={i18n.language}
-        >
-          <AuthProvider>{children}</AuthProvider>
-        </TranslationsProvider>
+        <ThemeProvider>
+          <ClientI18nProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </ClientI18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

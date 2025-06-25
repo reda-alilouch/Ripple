@@ -1,6 +1,14 @@
 // src/lib/mongodb.js
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 import mongoose from "mongoose";
 import { MongoClient } from "mongodb";
+
+// Charger les variables d'environnement
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({ path: join(__dirname, "../../.env.local") });
 
 if (!process.env.MONGODB_URI) {
   throw new Error("Please add your MongoDB URI to .env.local");
@@ -16,23 +24,18 @@ const mongoOptions = {
 // Récupérer l'URI
 let uri = process.env.MONGODB_URI;
 
-// Si l'URI ne contient pas déjà une adresse IP explicite
-if (!uri.includes('127.0.0.1') && !uri.includes('localhost')) {
-  uri = uri.replace('mongodb://', 'mongodb://127.0.0.1:');
-}
-
 // Partie MongoClient pour l'authentification
 let client;
 let clientPromise;
 
 if (process.env.NODE_ENV === "development") {
   if (!global._mongoClientPromise) {
-    client = new MongoClient(uri, mongoOptions);  // Utiliser mongoOptions au lieu de options
+    client = new MongoClient(uri, mongoOptions); // Utiliser mongoOptions au lieu de options
     global._mongoClientPromise = client.connect();
   }
   clientPromise = global._mongoClientPromise;
 } else {
-  client = new MongoClient(uri, mongoOptions);  // Et ici aussi
+  client = new MongoClient(uri, mongoOptions); // Et ici aussi
   clientPromise = client.connect();
 }
 
@@ -42,12 +45,12 @@ const connectMongoDB = async () => {
     if (mongoose.connection.readyState === 1) {
       return mongoose.connection;
     }
-    
+
     const conn = await mongoose.connect(uri, {
       ...mongoOptions,
       maxPoolSize: 10,
     });
-    
+
     console.log("MongoDB Connected");
     return conn;
   } catch (error) {

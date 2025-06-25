@@ -1,26 +1,32 @@
 "use client";
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useTranslation } from "react-i18next";
 import styles from "./Lang.module.css"; // ton module CSS
+
+const COOKIE_NAME = "i18next";
 
 export default function LangSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
-  const { i18n } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
+
+  // Dériver la langue directement de l'URL pour plus de fiabilité
+  const currentLocale = pathname.split("/")[1];
 
   const toggleLang = () => setIsOpen(!isOpen);
 
   const changeLanguage = (newLocale) => {
-    // ex: /fr/profil -> /en/profil
-    const newPath = pathname.replace(`/${i18n.language}`, `/${newLocale}`);
+    // 1. Définir le cookie pour mémoriser le choix
+    document.cookie = `${COOKIE_NAME}=${newLocale};path=/;max-age=31536000`;
+
+    // 2. Changer l'URL
+    const newPath = pathname.replace(`/${currentLocale}`, `/${newLocale}`);
     router.push(newPath);
     setIsOpen(false);
   };
 
   const getCurrentLanguageName = () => {
-    return i18n.language === "en" ? "English" : "Français";
+    return currentLocale === "en" ? "English" : "Français";
   };
 
   return (

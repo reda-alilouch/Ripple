@@ -1,19 +1,9 @@
 "use client";
+import { useTheme } from "next-themes";
 import "./Darkmode.css"; // Changement du chemin pour un chemin relatif
 
 const Darkmode = () => {
-  const toggleTheme = () => {
-    const html = document.documentElement;
-    const isDark = html.classList.contains("dark");
-
-    if (isDark) {
-      html.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else {
-      html.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
-  };
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="mode" id="darkModeToggle">
@@ -21,7 +11,8 @@ const Darkmode = () => {
         type="checkbox"
         className="checkbox btn"
         id="checkbox"
-        onClick={toggleTheme} // ← ✔ C'est ici que le toggle se fait
+        onChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+        checked={theme === "dark"}
       />
       <label
         htmlFor="checkbox"
