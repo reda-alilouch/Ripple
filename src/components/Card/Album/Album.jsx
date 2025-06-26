@@ -13,7 +13,7 @@ const Album = ({ album, className = "" }) => {
           height={200}
           className="rounded-lg"
         />
-        <div className="play-button absolute right-2 bottom-2">
+        <div className="play-button absolute right-2 bottom-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Icon lib="fa-solid" name="fa-play" className="text-xl" />
         </div>
       </div>

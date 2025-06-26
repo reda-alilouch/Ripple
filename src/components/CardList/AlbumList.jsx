@@ -13,13 +13,9 @@ export default function ListAlbum() {
         return JSON.parse(text);
       })
       .then((data) => {
-        console.log("🎧 Albums reçus:", data);
-
         if (Array.isArray(data.albums)) {
           setAlbums(data.albums.slice(0, 4));
-        } else {
-          console.error("❌ Les albums ne sont pas un tableau :", data.albums);
-        }
+        } 
       })
       .catch((err) => console.error("Erreur chargement albums:", err));
   }, []);

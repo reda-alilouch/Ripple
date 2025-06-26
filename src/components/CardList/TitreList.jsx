@@ -5,7 +5,7 @@ import Titre from "@/components/Card/Titre/Titre";
 
 // Création d'une instance axios avec une configuration de base
 const spotifyApi = axios.create({
-  baseURL: '/api/spotify',
+  baseURL: '/api/spotify/titres',
   timeout: 10000, // 10 secondes de timeout
   headers: {
     'Content-Type': 'application/json',

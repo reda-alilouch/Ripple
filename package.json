@@ -37,7 +37,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-i18next": "^15.5.3",
-    "spotify-web-api-node": "^5.0.2"
+    "spotify-web-api-node": "^5.0.2",
+    "swiper": "^11.2.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -1,5 +1,5 @@
 "use client";
-import Carousel from "@/components/Carousel";
+import Carousel from "@/components/Carousel/Carousel";
 
 import ListTrack from "@/components/CardList/TitreList";
 import ListAlbum from "@/components/CardList/AlbumList";

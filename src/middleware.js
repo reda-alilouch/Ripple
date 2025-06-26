@@ -4,6 +4,7 @@ import acceptLanguage from "accept-language";
 const supportedLngs = ["fr", "en"];
 const defaultLng = "fr";
 const cookieName = "i18next";
+const PUBLIC_FILE = /\.(.*)$/;
 
 acceptLanguage.languages(supportedLngs);
 
@@ -23,6 +24,17 @@ export function middleware(req) {
   // 3. Langue par défaut
   if (!lng) {
     lng = defaultLng;
+  }
+
+  const { pathname } = req.nextUrl;
+
+  // Ignore les fichiers statiques et les API routes
+  if (
+    pathname.startsWith("/api") ||
+    PUBLIC_FILE.test(pathname) ||
+    pathname.includes("_next")
+  ) {
+    return;
   }
 
   // Rediriger si la locale n'est pas dans l'URL

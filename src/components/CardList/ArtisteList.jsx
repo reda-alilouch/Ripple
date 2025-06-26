@@ -7,20 +7,12 @@ export default function ListArtiste() {
   useEffect(() => {
     fetch("/api/spotify/user-data")
       .then((res) => {
-        console.log("📡 Réponse brute artistes:", res);
         return res.json();
       })
       .then((data) => {
-        console.log("🎨 Artistes reçus:", data);
-
         if (Array.isArray(data.artists)) {
           setArtists(data.artists.slice(0, 8));
-        } else {
-          console.error(
-            "❌ Les artistes ne sont pas un tableau:",
-            data.artists
-          );
-        }
+        } 
       })
       .catch((err) => console.error("❌ Erreur fetch artistes:", err));
   }, []);
