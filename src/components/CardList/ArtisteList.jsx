@@ -4,18 +4,71 @@ import Artiste from "../Card/Artiste/Artiste";
 
 export default function ListArtiste() {
   const [artists, setArtists] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
-    fetch("/api/spotify/user-data")
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data.artists)) {
-          setArtists(data.artists.slice(0, 8));
-        } 
-      })
-      .catch((err) => console.error("❌ Erreur fetch artistes:", err));
+    const fetchArtistes = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await fetch("/api/artistes");
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des artistes");
+        }
+
+        const data = await response.json();
+        console.log("Données artistes reçues:", data);
+
+        if (data.artists && Array.isArray(data.artists)) {
+          setArtists(data.artists);
+        } else {
+          console.warn("Format de données inattendu pour les artistes:", data);
+          setArtists([]);
+        }
+      } catch (err) {
+        console.error("❌ Erreur fetch artistes:", err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArtistes();
   }, []);
+
+  if (isLoading) {
+    return (
+      <section className="section container px-5 pt-5 pb-5">
+        <div className="head flex justify-between items-center mb-5">
+          <h2 className="top font-bold">Top artistes</h2>
+        </div>
+        <div className="flex justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="section container px-5 pt-5 pb-5">
+        <div className="head flex justify-between items-center mb-5">
+          <h2 className="top font-bold">Top artistes</h2>
+        </div>
+        <div className="text-red-500">
+          {error}
+          <button
+            onClick={() => window.location.reload()}
+            className="ml-2 text-blue-400 hover:underline"
+          >
+            Réessayer
+          </button>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="section container px-5 pt-5 pb-5">
@@ -32,23 +85,25 @@ export default function ListArtiste() {
         </div>
       </div>
       <div id="cards-container" className="flex flex-wrap justify-center gap-7">
-        {artists.length === 0 && <p className="px-5">Aucun artiste trouvé.</p>}
+        {artists.length === 0 ? (
+          <p className="px-5 text-gray-500">Aucun artiste trouvé.</p>
+        ) : (
+          artists.map((artist, index) => {
+            let className = "";
 
-        {artists.map((artist, index) => {
-          let className = "";
+            if (index < 4) {
+              className = ""; // visible partout
+            } else if (index >= 4 && index < 6) {
+              className = "hidden sm:block"; // visible à partir de sm (≥ 640px)
+            } else if (index >= 6 && index < 8) {
+              className = "hidden lg:block"; // visible à partir de lg (≥ 1024px)
+            }
 
-          if (index < 4) {
-            className = ""; // visible partout
-          } else if (index >= 4 && index < 6) {
-            className = "hidden sm:block"; // visible à partir de sm (≥ 640px)
-          } else if (index >= 6 && index < 8) {
-            className = "hidden lg:block"; // visible à partir de lg (≥ 1024px)
-          }
-
-          return (
-            <Artiste key={artist.id} artist={artist} className={className} />
-          );
-        })}
+            return (
+              <Artiste key={artist.id} artist={artist} className={className} />
+            );
+          })
+        )}
       </div>
     </section>
   );

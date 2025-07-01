@@ -71,6 +71,7 @@ async function syncAll() {
     const albums = await getSpotifyAlbums();
     console.log(`${albums.length} albums récupérés`);
     for (const album of albums) {
+      album.image = (album.images && album.images[0]?.url) || "";
       await Album.updateOne(
         { spotifyId: album.spotifyId },
         { $set: album },
@@ -84,6 +85,8 @@ async function syncAll() {
     const playlists = await getSpotifyPlaylists();
     console.log(`${playlists.length} playlists récupérées`);
     for (const playlist of playlists) {
+      playlist.image =
+        (playlist.images && playlist.images[0]?.url) || playlist.image || "";
       await Playlist.updateOne(
         { spotifyId: playlist.spotifyId },
         { $set: playlist },

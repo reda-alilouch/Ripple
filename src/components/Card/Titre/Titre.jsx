@@ -13,7 +13,7 @@ const formatDuration = (ms) => {
   return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 };
 
-const Titre = ({ track, className = "" }) => {
+const Titre = ({ track, className = "", playlistId }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audio, setAudio] = useState(null);
   const [hasError, setHasError] = useState(false);
@@ -90,15 +90,21 @@ const Titre = ({ track, className = "" }) => {
             <div className="relative w-16 h-16 flex-shrink-0">
               <img
                 className="img-titre rounded-md object-cover w-full h-full"
-                src={track.image}
+                src={track.image || "/default-album.jpg"}
                 alt={`Pochette de ${track.name}`}
                 onError={(e) => {
                   e.target.onerror = null;
                   e.target.src = "/default-album.jpg";
                 }}
-                onLoad={() => setHasError(false)}
+                onLoad={() => {
+                  console.log(
+                    `Image chargée avec succès pour ${track.name}:`,
+                    track.image
+                  );
+                  setHasError(false);
+                }}
               />
-              {track.preview_url && (
+              {track.preview_url ? (
                 <button
                   onClick={handlePlay}
                   className={`absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md transition-opacity ${
@@ -114,6 +120,18 @@ const Titre = ({ track, className = "" }) => {
                     className="text-white text-xl"
                   />
                 </button>
+              ) : (
+                <div
+                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Aperçu non disponible"
+                >
+                  <button
+                    className="text-xs text-white bg-gray-500 bg-opacity-80 px-3 py-1 rounded cursor-not-allowed"
+                    disabled
+                  >
+                    Aperçu non disponible
+                  </button>
+                </div>
               )}
             </div>
           </a>
@@ -165,7 +183,7 @@ const Titre = ({ track, className = "" }) => {
           <span className="text-sm text-gray-500">
             {formatDuration(track.duration_ms)}
           </span>
-          <AddTitre trackId={track._id} playlistId={playlistId} />
+          <AddTitre trackId={track._id} playlistId={null} />
         </div>
       </div>
     </div>

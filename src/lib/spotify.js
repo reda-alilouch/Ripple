@@ -132,21 +132,26 @@ export const getAccessToken = async () => {
 // Récupérer des titres populaires (exemple: top tracks d'un artiste connu)
 export const getSpotifyTracks = async () => {
   const accessToken = await getAccessToken();
-  // Exemple: top tracks de l'artiste Drake (id: 3TVXtAsR1Inumwj472S9r4)
+  // ID de la playlist "Top 50 Global"
+  const playlistId = "37i9dQZEVXbMDoHDwVN2tF";
   const response = await axios.get(
-    `https://api.spotify.com/v1/artists/3TVXtAsR1Inumwj472S9r4/top-tracks?market=FR`,
+    `https://api.spotify.com/v1/playlists/${playlistId}/tracks?market=US&limit=100`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
     }
   );
-  return response.data.tracks.map((track) => ({
-    spotifyId: track.id,
-    name: track.name,
-    artists: track.artists.map((a) => a.name),
-    album: track.album.name,
-    duration: track.duration_ms,
-    previewUrl: track.preview_url,
-  }));
+  return response.data.items
+    .map((item) => item.track)
+    .filter((track) => !!track && !!track.preview_url)
+    .map((track) => ({
+      spotifyId: track.id,
+      name: track.name,
+      artists: track.artists.map((a) => a.name),
+      album: track.album.name,
+      image: track.album.images[0]?.url || "",
+      duration: track.duration_ms,
+      previewUrl: track.preview_url,
+    }));
 };
 
 // Récupérer des artistes populaires avec pagination
