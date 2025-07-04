@@ -1,25 +1,31 @@
 "use client";
 import { useEffect, useState } from "react";
 import Playlist from "@/components/Card/Playlist/Playlist";
-
+import { useTranslation } from "react-i18next";
 const PlaylistList = () => {
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const { t } = useTranslation("common");
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
-        const response = await fetch(
-          "/api/spotify/search?q=top%20playlist&type=playlist&limit=6"
-        );
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch("/api/playlists");
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des playlists");
         }
+
         const data = await response.json();
-        setPlaylists(data.playlists?.items || []);
+
+        if (data.playlists && Array.isArray(data.playlists)) {
+          setPlaylists(data.playlists);
+        } else {
+          setPlaylists([]);
+        }
       } catch (err) {
-        console.error("Erreur:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -32,6 +38,9 @@ const PlaylistList = () => {
   if (loading) {
     return (
       <section className="section container px-5 pt-5 pb-5">
+        <div className="head flex justify-between items-center mb-5">
+          <h2 className="top font-bold text-2xl">{t("topPlaylists")}</h2>
+        </div>
         <div className="flex justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
         </div>
@@ -40,19 +49,34 @@ const PlaylistList = () => {
   }
 
   if (error) {
-    console.error("Erreur:", error);
+    return (
+      <section className="section container px-5 pt-5 pb-5">
+        <div className="head flex justify-between items-center mb-5">
+          <h2 className="top font-bold text-2xl">{t("topPlaylists")}</h2>
+        </div>
+        <div className="text-red-500">
+          {error}
+          <button
+            onClick={() => window.location.reload()}
+            className="ml-2 text-blue-400 hover:underline"
+          >
+            Réessayer
+          </button>
+        </div>
+      </section>
+    );
   }
 
   return (
     <section className="section container px-5 pt-5 pb-5">
       <div className="head flex justify-between items-center mb-5">
-        <h2 className="top font-bold text-2xl">Top playlists</h2>
+        <h2 className="top font-bold text-2xl">{t("topPlaylists")}</h2>
         <div className="voir-plus">
           <a
             href="/Playlistes"
             className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
           >
-            <span>Voir plus</span>
+            <span>{t("voirPlus")}</span>
             <i className="fa-solid fa-arrow-right"></i>
           </a>
         </div>

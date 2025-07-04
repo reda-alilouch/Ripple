@@ -5,14 +5,8 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-// Fonction pour logger les actions
-const logAction = (action, details) => {
-  console.log(`[Modal] ${action}:`, details);
-};
-
 // Fonction pour gérer les erreurs
 const handleError = (error, context) => {
-  console.error(`[Modal Error - ${context}]:`, error);
   return (
     error.response?.data?.error || error.message || "Une erreur est survenue"
   );
@@ -22,10 +16,8 @@ const handleError = (error, context) => {
 const ensureMongoConnection = async () => {
   try {
     await connectMongoDB();
-    logAction("MongoDB Connection", "Successfully connected");
     return true;
   } catch (error) {
-    console.error("[MongoDB Connection Error]:", error);
     return false;
   }
 };

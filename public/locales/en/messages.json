@@ -1,0 +1,7 @@
+{
+  "loading": "Loading...",
+  "error": "Error",
+  "success": "Success",
+  "incorrectCredentials": "Incorrect email or password",
+  "registrationSuccess": "Registration successful!"
+}

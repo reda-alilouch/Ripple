@@ -113,7 +113,7 @@ const SearchBar = () => {
           id="icon-search-container"
           onClick={searchonclick}
         >
-          <Icon lib="fa-solid" name="fa-magnifying-glass" className="icon-search" id="icon-search" />
+          <Icon lib="fa-solid" name="fa-magnifying-glass" className="icon-search text-white" id="icon-search" />
         </div>
       </div>
     </div>

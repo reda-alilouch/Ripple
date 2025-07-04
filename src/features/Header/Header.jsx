@@ -13,15 +13,8 @@ import styles from "@/features/Header/Header.module.css";
 import { menuonclick } from "@/js/aside";
 const Header = ({ onToggleSidebar }) => {
   const { i18n } = useTranslation();
-  const { theme } = useTheme();
+
   const locale = i18n.language;
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const logoSrc = mounted && theme === "dark" ? "/darkmd.png" : "/lightmd.png";
 
   return (
     <header
@@ -42,6 +35,7 @@ const Header = ({ onToggleSidebar }) => {
             width={130}
             height={38}
             priority
+            unoptimized
             className="block dark:hidden"
           />
           <Image
@@ -50,6 +44,7 @@ const Header = ({ onToggleSidebar }) => {
             width={130}
             height={38}
             priority
+            unoptimized
             className="hidden dark:block"
           />
         </Link>

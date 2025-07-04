@@ -21,7 +21,6 @@ export const exchangeCodeForToken = async (code) => {
 
     return response.data;
   } catch (error) {
-    console.error("Erreur échange token Spotify:", error.response?.data);
     throw error;
   }
 };
@@ -46,7 +45,6 @@ export const refreshSpotifyToken = async (refreshToken) => {
 
     return response.data;
   } catch (error) {
-    console.error("Erreur refresh token Spotify:", error.response?.data);
     throw error;
   }
 };
@@ -62,7 +60,6 @@ export const getSpotifyProfile = async (accessToken) => {
 
     return response.data;
   } catch (error) {
-    console.error("Erreur profil Spotify:", error.response?.data);
     throw error;
   }
 };
@@ -81,7 +78,6 @@ export const getUserTopTracks = async (accessToken, limit = 20) => {
 
     return response.data;
   } catch (error) {
-    console.error("Erreur top tracks Spotify:", error.response?.data);
     throw error;
   }
 };
@@ -100,7 +96,6 @@ export const getUserPlaylists = async (accessToken, limit = 50) => {
 
     return response.data;
   } catch (error) {
-    console.error("Erreur playlists Spotify:", error.response?.data);
     throw error;
   }
 };
@@ -124,7 +119,6 @@ export const getAccessToken = async () => {
 
     return response.data.access_token;
   } catch (error) {
-    console.error("Erreur obtention token Spotify:", error.response?.data);
     throw error;
   }
 };
@@ -132,21 +126,26 @@ export const getAccessToken = async () => {
 // Récupérer des titres populaires (exemple: top tracks d'un artiste connu)
 export const getSpotifyTracks = async () => {
   const accessToken = await getAccessToken();
-  // Exemple: top tracks de l'artiste Drake (id: 3TVXtAsR1Inumwj472S9r4)
+  // ID de la playlist "Top 50 Global"
+  const playlistId = "37i9dQZEVXbMDoHDwVN2tF";
   const response = await axios.get(
-    `https://api.spotify.com/v1/artists/3TVXtAsR1Inumwj472S9r4/top-tracks?market=FR`,
+    `https://api.spotify.com/v1/playlists/${playlistId}/tracks?market=US&limit=100`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
     }
   );
-  return response.data.tracks.map((track) => ({
-    spotifyId: track.id,
-    name: track.name,
-    artists: track.artists.map((a) => a.name),
-    album: track.album.name,
-    duration: track.duration_ms,
-    previewUrl: track.preview_url,
-  }));
+  return response.data.items
+    .map((item) => item.track)
+    .filter((track) => !!track && !!track.preview_url)
+    .map((track) => ({
+      spotifyId: track.id,
+      name: track.name,
+      artists: track.artists.map((a) => a.name),
+      album: track.album.name,
+      image: track.album.images[0]?.url || "",
+      duration: track.duration_ms,
+      previewUrl: track.preview_url,
+    }));
 };
 
 // Récupérer des artistes populaires avec pagination
@@ -230,10 +229,6 @@ export const getSpotifyPlaylists = async () => {
 
       // Stop si moins de 50 résultats (fin de la pagination)
       if (response.data.playlists.items.length < limit) break;
-    } else {
-      // Affiche la réponse brute pour debug
-      console.log("Réponse inattendue de l'API Spotify:", response.data);
-      break;
     }
   }
 
