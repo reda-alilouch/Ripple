@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import Album from "@/components/Card/Album/Album";
+import { useTranslation } from "react-i18next";
 
 export default function ListAlbum() {
   const [albums, setAlbums] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const { t } = useTranslation("common");
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
@@ -42,7 +43,7 @@ export default function ListAlbum() {
     return (
       <section className="section container px-5 pt-5">
         <div className="head flex justify-between items-center">
-          <h2 className="top font-bold">Top albums</h2>
+          <h2 className="top font-bold">{t("topAlbums")}</h2>
         </div>
         <div className="flex justify-center mt-5">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
@@ -55,7 +56,7 @@ export default function ListAlbum() {
     return (
       <section className="section container px-5 pt-5">
         <div className="head flex justify-between items-center">
-          <h2 className="top font-bold">Top albums</h2>
+          <h2 className="top font-bold">{t("topAlbums")}</h2>
         </div>
         <div className="text-red-500 mt-5">
           {error}
@@ -73,13 +74,13 @@ export default function ListAlbum() {
   return (
     <section className="section container px-5 pt-5">
       <div className="head flex justify-between items-center">
-        <h2 className="top font-bold">Top albums</h2>
+        <h2 className="top font-bold">{t("topAlbums")}</h2>
         <div className="voir-plus flex">
           <a
             href="/Albums"
             className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
           >
-            <span>Voir plus</span>
+            <span>{t("voirPlus")}</span>
             <i className="fa-solid fa-arrow-right"></i>
           </a>
         </div>

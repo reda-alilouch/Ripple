@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import Playlist from "@/components/Card/Playlist/Playlist";
-
+import { useTranslation } from "react-i18next";
 const PlaylistList = () => {
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const { t } = useTranslation("common");
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
@@ -19,16 +19,13 @@ const PlaylistList = () => {
         }
 
         const data = await response.json();
-        console.log("Données playlists reçues:", data);
 
         if (data.playlists && Array.isArray(data.playlists)) {
           setPlaylists(data.playlists);
         } else {
-          console.warn("Format de données inattendu pour les playlists:", data);
           setPlaylists([]);
         }
       } catch (err) {
-        console.error("Erreur:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -42,7 +39,7 @@ const PlaylistList = () => {
     return (
       <section className="section container px-5 pt-5 pb-5">
         <div className="head flex justify-between items-center mb-5">
-          <h2 className="top font-bold text-2xl">Top playlists</h2>
+          <h2 className="top font-bold text-2xl">{t("topPlaylists")}</h2>
         </div>
         <div className="flex justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
@@ -55,7 +52,7 @@ const PlaylistList = () => {
     return (
       <section className="section container px-5 pt-5 pb-5">
         <div className="head flex justify-between items-center mb-5">
-          <h2 className="top font-bold text-2xl">Top playlists</h2>
+          <h2 className="top font-bold text-2xl">{t("topPlaylists")}</h2>
         </div>
         <div className="text-red-500">
           {error}
@@ -73,13 +70,13 @@ const PlaylistList = () => {
   return (
     <section className="section container px-5 pt-5 pb-5">
       <div className="head flex justify-between items-center mb-5">
-        <h2 className="top font-bold text-2xl">Top playlists</h2>
+        <h2 className="top font-bold text-2xl">{t("topPlaylists")}</h2>
         <div className="voir-plus">
           <a
             href="/Playlistes"
             className="flex items-center gap-2 text-gray-600 hover:text-red-500 transition-colors"
           >
-            <span>Voir plus</span>
+            <span>{t("voirPlus")}</span>
             <i className="fa-solid fa-arrow-right"></i>
           </a>
         </div>

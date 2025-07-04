@@ -11,18 +11,8 @@ const Album = ({ album, className = "" }) => {
           alt={`Pochette de ${album.name}`}
           className="w-full h-full object-cover rounded-md"
           onError={(e) => {
-            console.warn(
-              `Erreur de chargement de l'image pour ${album.name}:`,
-              album.image
-            );
             e.target.onerror = null;
             e.target.src = "/default-album.jpg";
-          }}
-          onLoad={() => {
-            console.log(
-              `Image chargée avec succès pour ${album.name}:`,
-              album.image
-            );
           }}
         />
         <div className="play-button absolute right-2 bottom-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

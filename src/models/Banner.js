@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 
 const bannerSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
+  title: { type: Object, required: true },
+  description: { type: Object, required: true },
   image: { type: String, required: true }, // URL de l'image
 });
 

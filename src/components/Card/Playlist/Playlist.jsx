@@ -14,18 +14,8 @@ const Playlist = ({ playlist, className = "" }) => {
         alt={`Pochette de ${playlist.name}`}
         className="w-full h-full object-cover rounded-md"
         onError={(e) => {
-          console.warn(
-            `Erreur de chargement de l'image pour ${playlist.name}:`,
-            playlist.image
-          );
           e.target.onerror = null;
           e.target.src = "/default-playlist.svg";
-        }}
-        onLoad={() => {
-          console.log(
-            `Image chargée avec succès pour ${playlist.name}:`,
-            playlist.image
-          );
         }}
       />
 

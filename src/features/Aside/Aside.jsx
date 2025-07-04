@@ -3,15 +3,18 @@ import styles from "./Aside.module.css";
 import Icon from "@/components/Icon/index";
 import Link from "next/link";
 import { menuonclick } from "@/js/aside";
+import { useTranslation } from "react-i18next";
+
 const Aside = ({ isOpen, locale }) => {
+  const { t } = useTranslation("common");
   const AsidesArray = [
-    { icon: "bxs-home", lib: "bx", namepage: "Accueil", href: "/" },
-    { icon: "bxs-user", lib: "bx", namepage: "Artistes", href: "/Artistes" },
-    { icon: "bxs-album", lib: "bx", namepage: "Albums", href: "/Albums" },
+    { icon: "bxs-home", lib: "bx", namepage: t("home"), href: "/" },
+    { icon: "bxs-user", lib: "bx", namepage: t("artists"), href: "/Artistes" },
+    { icon: "bxs-album", lib: "bx", namepage: t("albums"), href: "/Albums" },
     {
       icon: "bxs-playlist",
       lib: "bx",
-      namepage: "Playlistes",
+      namepage: t("playlists"),
       href: "/Playlistes",
     },
   ];

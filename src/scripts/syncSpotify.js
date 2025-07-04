@@ -36,14 +36,10 @@ import {
 
 async function syncAll() {
   try {
-    console.log("Début de la synchronisation...");
     await connectMongoDB();
-    console.log("Connexion MongoDB établie");
 
     // Titres
-    console.log("Récupération des titres...");
     const tracks = await getSpotifyTracks();
-    console.log(`${tracks.length} titres récupérés`);
     for (const track of tracks) {
       await Titre.updateOne(
         { spotifyId: track.spotifyId },
@@ -51,12 +47,9 @@ async function syncAll() {
         { upsert: true }
       );
     }
-    console.log("Titres synchronisés");
 
     // Artistes
-    console.log("Récupération des artistes...");
     const artists = await getSpotifyArtists();
-    console.log(`${artists.length} artistes récupérés`);
     for (const artist of artists) {
       await Artiste.updateOne(
         { spotifyId: artist.spotifyId },
@@ -64,12 +57,9 @@ async function syncAll() {
         { upsert: true }
       );
     }
-    console.log("Artistes synchronisés");
 
     // Albums
-    console.log("Récupération des albums...");
     const albums = await getSpotifyAlbums();
-    console.log(`${albums.length} albums récupérés`);
     for (const album of albums) {
       album.image = (album.images && album.images[0]?.url) || "";
       await Album.updateOne(
@@ -78,12 +68,9 @@ async function syncAll() {
         { upsert: true }
       );
     }
-    console.log("Albums synchronisés");
 
     // Playlists
-    console.log("Récupération des playlists...");
     const playlists = await getSpotifyPlaylists();
-    console.log(`${playlists.length} playlists récupérées`);
     for (const playlist of playlists) {
       playlist.image =
         (playlist.images && playlist.images[0]?.url) || playlist.image || "";
@@ -93,11 +80,7 @@ async function syncAll() {
         { upsert: true }
       );
     }
-    console.log("Playlists synchronisées");
-
-    console.log("Synchronisation terminée avec succès !");
   } catch (error) {
-    console.error("Erreur lors de la synchronisation:", error);
     process.exit(1);
   }
 }

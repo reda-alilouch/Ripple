@@ -2,11 +2,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Titre from "@/components/Card/Titre/Titre";
+import { useTranslation } from "react-i18next";
 
 export default function ListTrack() {
   const [tracks, setTracks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useTranslation("common");
 
   useEffect(() => {
     const fetchTitres = async () => {
@@ -20,20 +22,14 @@ export default function ListTrack() {
         });
 
         const data = response.data;
-        console.log("Réponse de l'API MongoDB:", data);
 
         // Vérifier si nous avons des pistes dans la réponse
         if (!data.tracks) {
-          console.error("Aucune donnée de piste dans la réponse:", data);
           throw new Error("Aucune donnée de piste disponible");
         }
 
         // Vérifier que data.tracks est bien un tableau
         if (!Array.isArray(data.tracks)) {
-          console.error(
-            "Format de données inattendu pour les pistes:",
-            data.tracks
-          );
           throw new Error("Format de données incorrect pour les pistes");
         }
 
@@ -49,8 +45,6 @@ export default function ListTrack() {
           })
           .map((track) => {
             try {
-              console.log("Traitement de la piste:", track);
-
               // Les données sont déjà formatées par l'API MongoDB
               return {
                 id: track.id,
@@ -74,7 +68,6 @@ export default function ListTrack() {
           })
           .filter(Boolean); // Filtrer les pistes null (en erreur)
 
-        console.log("Pistes transformées:", titres);
         setTracks(titres);
       } catch (err) {
         console.error("Erreur lors de la récupération des titres:", err);
@@ -95,7 +88,7 @@ export default function ListTrack() {
     return (
       <section className="section container">
         <div className="head pt-5 px-5">
-          <h2 className="top font-bold">Top titres</h2>
+          <h2 className="top font-bold">{t("topTracks")}</h2>
         </div>
         <div className="px-5">Chargement des titres en cours...</div>
       </section>
@@ -106,7 +99,7 @@ export default function ListTrack() {
     return (
       <section className="section container">
         <div className="head pt-5 px-5">
-          <h2 className="top font-bold">Top titres</h2>
+          <h2 className="top font-bold">{t("topTracks")}</h2>
         </div>
         <div className="px-5 text-red-500">
           {error}
@@ -124,7 +117,7 @@ export default function ListTrack() {
   return (
     <section className="section container">
       <div className="head pt-5 px-5">
-        <h2 className="top font-bold">Top titres</h2>
+        <h2 className="top font-bold">{t("topTracks")}</h2>
       </div>
       <div className="song-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {tracks.length === 0 ? (

@@ -3,6 +3,7 @@ import "./global.css";
 import AuthProvider from "@/components/AuthProvider";
 import ClientI18nProvider from "@/components/ClientI18nProvider";
 import ThemeProvider from "@/components/ThemeProvider";
+import ForceI18nLanguageFromUrl from "@/components/ForceI18nLanguageFromUrl";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} bg-white dark:bg-slate-900`}>
         <ThemeProvider>
           <ClientI18nProvider>
+            <ForceI18nLanguageFromUrl />
             <AuthProvider>{children}</AuthProvider>
           </ClientI18nProvider>
         </ThemeProvider>

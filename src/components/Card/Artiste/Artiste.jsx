@@ -11,18 +11,8 @@ const Artiste = ({ artist, className = "" }) => {
             src={artist.image || "/default-artist.svg"}
             alt={`Photo de ${artist.name}`}
             onError={(e) => {
-              console.warn(
-                `Erreur de chargement de l'image pour ${artist.name}:`,
-                artist.image
-              );
               e.target.onerror = null;
               e.target.src = "/default-artist.svg";
-            }}
-            onLoad={() => {
-              console.log(
-                `Image chargée avec succès pour ${artist.name}:`,
-                artist.image
-              );
             }}
           />
           <h3 className="h3-artistes text-center">{artist.name}</h3>

@@ -20,7 +20,6 @@ const Titre = ({ track, className = "", playlistId }) => {
 
   // Vérifier que la piste est valide
   if (!track || !track.id || !track.name) {
-    console.warn("Piste invalide dans le composant Titre:", track);
     return null;
   }
 
@@ -50,9 +49,7 @@ const Titre = ({ track, className = "", playlistId }) => {
 
         setAudio(newAudio);
         await newAudio.play();
-      } catch (err) {
-        console.error("Erreur de lecture:", err);
-      }
+      } catch (err) {}
     }
   };
 
@@ -97,10 +94,6 @@ const Titre = ({ track, className = "", playlistId }) => {
                   e.target.src = "/default-album.jpg";
                 }}
                 onLoad={() => {
-                  console.log(
-                    `Image chargée avec succès pour ${track.name}:`,
-                    track.image
-                  );
                   setHasError(false);
                 }}
               />

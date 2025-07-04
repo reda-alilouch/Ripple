@@ -4,7 +4,6 @@ import { getAccessToken } from "@/lib/spotify";
 import connectMongoDB from "@/lib/mongodb";
 
 async function fetchSpotifyData(endpoint, accessToken) {
-  console.log(`Fetching data from ${endpoint}...`);
   const response = await fetch(`https://api.spotify.com/v1${endpoint}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -12,7 +11,6 @@ async function fetchSpotifyData(endpoint, accessToken) {
   });
 
   if (!response.ok) {
-    console.error(`Error response from Spotify:`, await response.text());
     throw new Error(`Erreur Spotify API: ${response.statusText}`);
   }
 
@@ -156,28 +154,21 @@ async function syncArtists(accessToken) {
 
 export async function GET() {
   try {
-    console.log("Starting MongoDB connection...");
     await connectMongoDB();
-    console.log("MongoDB connected successfully");
 
-    console.log("Getting Spotify access token...");
     const accessToken = await getAccessToken();
-    console.log("Got Spotify access token");
 
-    console.log("Starting data synchronization...");
     const [tracksCount, artistsCount, albumsCount] = await Promise.all([
       syncTracks(accessToken),
       syncArtists(accessToken),
       syncAlbums(accessToken),
     ]);
-    console.log("Data synchronization completed");
 
     return NextResponse.json({
       success: true,
       message: `Synchronisation réussie: ${tracksCount} titres, ${artistsCount} artistes et ${albumsCount} albums mis à jour`,
     });
   } catch (error) {
-    console.error("Detailed error:", error);
     return NextResponse.json(
       { success: false, error: error.message },
       { status: 500 }
