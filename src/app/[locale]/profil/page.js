@@ -1,15 +1,20 @@
 import { getServerSession } from "next-auth/next";
 import { connectMongoDB } from "@/lib/mongodb";
 import User from "@/models/users";
+import ProfilClient from "./ProfilClient";
 
 export default async function Profil() {
   const session = await getServerSession();
 
   if (!session) {
     return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold">Profil</h1>
-        <p>Vous devez être connecté pour voir cette page.</p>
+      <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center">
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center">
+          <h1 className="text-3xl font-bold text-white mb-4">Profil</h1>
+          <p className="text-gray-200">
+            Vous devez être connecté pour voir cette page.
+          </p>
+        </div>
       </div>
     );
   }
@@ -45,14 +50,8 @@ export default async function Profil() {
     };
   }
 
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Profil</h1>
-      <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
-        <pre className="whitespace-pre-wrap break-all">
-          {JSON.stringify(userData, null, 2)}
-        </pre>
-      </div>
-    </div>
-  );
+  // Conversion en objet simple pour éviter les problèmes Mongoose/Buffer
+  const userDataSimple = JSON.parse(JSON.stringify(userData));
+
+  return <ProfilClient userData={userDataSimple} />;
 }
