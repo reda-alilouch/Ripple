@@ -36,7 +36,6 @@ if (typeof window !== "undefined") {
 export function setupSplide() {
   function initSplide() {
     // ... ici ton code pour initialiser Splide
-    console.log("Splide initialisé");
   }
 
   initSplide();

@@ -1,6 +1,7 @@
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import { clientPromise } from "@/lib/mongodb";
 import { authProviders } from "@/lib/auth-providers";
+import User from "@/models/users";
 
 export const authConfig = {
   adapter: MongoDBAdapter(clientPromise),
@@ -22,6 +23,10 @@ export const authConfig = {
     async session({ session, token }) {
       if (token?.sub) {
         session.user.id = token.sub;
+        const user = await User.findById(token.sub).lean();
+        if (user) {
+          session.user.image = user.image || null;
+        }
       }
       if (token?.provider) {
         session.user.provider = token.provider;

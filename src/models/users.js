@@ -15,9 +15,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: function () {
-        return this.provider === "credentials";
-      },
+      required: false,
     },
     provider: {
       type: String,

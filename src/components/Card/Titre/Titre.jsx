@@ -37,7 +37,7 @@ const Titre = ({ track, className = "", playlistId }) => {
         // Arrêter tout autre son en cours
         if (audio) {
           audio.pause();
-          setAudio(null);
+          setAudio();
         }
 
         // Créer un nouvel objet audio

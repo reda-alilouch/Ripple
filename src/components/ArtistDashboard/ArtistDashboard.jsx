@@ -2,10 +2,31 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Icon from "@/components/Icon";
-import styles from "./ArtistDashboard.module.css";
 
 const ArtistDashboard = ({ artistData }) => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [bannerImage, setBannerImage] = useState(
+    artistData?.bannerImage || "/default-banner.jpg"
+  );
+  const [profileImage, setProfileImage] = useState(
+    artistData?.image || "/default-artist.svg"
+  );
+  const [showBannerUpload, setShowBannerUpload] = useState(false);
+  const [showProfileUpload, setShowProfileUpload] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [uploadForm, setUploadForm] = useState({
+    title: "",
+    description: "",
+    projectType: "single",
+    collaborators: "",
+    audioFile: null,
+    imageFile: null,
+    imagePreview: null,
+    audioPreview: null,
+  });
+  const [isUploading, setIsUploading] = useState(false);
   const [stats, setStats] = useState({
     monthlyListeners: 0,
     totalStreams: 0,
@@ -13,6 +34,188 @@ const ArtistDashboard = ({ artistData }) => {
     albumsCount: 0,
     tracksCount: 0,
   });
+
+  // Fonction pour gérer le redimensionnement
+  const handleResize = () => {
+    const width = window.innerWidth;
+    setIsMobile(width < 768);
+    setIsTablet(width >= 768 && width < 1024);
+  };
+
+  // Écouteur d'événement resize
+  useEffect(() => {
+    handleResize(); // Initialisation
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Fonction pour uploader une image
+  const handleImageUpload = (event, type) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (type === "banner") {
+          setBannerImage(e.target.result);
+          setShowBannerUpload(false);
+        } else if (type === "profile") {
+          setProfileImage(e.target.result);
+          setShowProfileUpload(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Fonction pour ouvrir le sélecteur de fichier
+  const openFileSelector = (type) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e) => handleImageUpload(e, type);
+    input.click();
+  };
+
+  // Fonction pour gérer les changements du formulaire
+  const handleFormChange = (field, value) => {
+    setUploadForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Fonction pour gérer l'upload de fichiers
+  const handleFileUpload = (event, type) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (type === "audio") {
+          setUploadForm((prev) => ({
+            ...prev,
+            audioFile: file,
+            audioPreview: e.target.result,
+          }));
+        } else if (type === "image") {
+          setUploadForm((prev) => ({
+            ...prev,
+            imageFile: file,
+            imagePreview: e.target.result,
+          }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Fonction pour soumettre le formulaire
+  const handleSubmitProject = async (e) => {
+    e.preventDefault();
+    setIsUploading(true);
+
+    try {
+      // Validation côté client
+      if (!uploadForm.title.trim()) {
+        alert("Le titre du projet est requis");
+        return;
+      }
+
+      if (!uploadForm.audioFile) {
+        alert("Un fichier audio est requis");
+        return;
+      }
+
+      // Créer FormData pour l'upload
+      const formData = new FormData();
+      formData.append("title", uploadForm.title.trim());
+      formData.append("description", uploadForm.description.trim());
+      formData.append("projectType", uploadForm.projectType);
+      formData.append("collaborators", uploadForm.collaborators.trim());
+
+      if (uploadForm.audioFile) {
+        formData.append("audioFile", uploadForm.audioFile);
+      }
+      if (uploadForm.imageFile) {
+        formData.append("imageFile", uploadForm.imageFile);
+      }
+
+      console.log("Envoi des données:", {
+        title: uploadForm.title,
+        projectType: uploadForm.projectType,
+        hasAudio: !!uploadForm.audioFile,
+        hasImage: !!uploadForm.imageFile,
+      });
+
+      // Envoyer à l'API
+      const response = await fetch("/api/projects/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      console.log("Réponse du serveur:", response.status, response.statusText);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Projet uploadé avec succès:", result);
+
+        // Réinitialiser le formulaire
+        setUploadForm({
+          title: "",
+          description: "",
+          projectType: "single",
+          collaborators: "",
+          audioFile: null,
+          imageFile: null,
+          imagePreview: null,
+          audioPreview: null,
+        });
+
+        setShowUploadModal(false);
+        alert("Projet uploadé avec succès !");
+      } else {
+        const errorData = await response.json();
+        console.error("Erreur API:", errorData);
+        alert(`Erreur: ${errorData.error || "Erreur lors de l'upload"}`);
+      }
+    } catch (error) {
+      console.error("Erreur upload détaillée:", error);
+      alert(`Erreur de connexion: ${error.message}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  // Fonction pour réinitialiser le formulaire
+  const resetForm = () => {
+    setUploadForm({
+      title: "",
+      description: "",
+      projectType: "single",
+      collaborators: "",
+      audioFile: null,
+      imageFile: null,
+      imagePreview: null,
+      audioPreview: null,
+    });
+    setShowUploadModal(false);
+  };
+
+  // Fonction pour tester la récupération des projets
+  const testGetProjects = async () => {
+    try {
+      const response = await fetch("/api/projects");
+      const data = await response.json();
+      console.log("Projets récupérés:", data);
+      if (data.success) {
+        alert(`Nombre de projets en base: ${data.projects.length}`);
+      } else {
+        alert("Erreur lors de la récupération des projets");
+      }
+    } catch (error) {
+      console.error("Erreur test projets:", error);
+      alert("Erreur de connexion");
+    }
+  };
 
   // Données fictives pour les albums
   const albums = [
@@ -73,7 +276,6 @@ const ArtistDashboard = ({ artistData }) => {
   };
 
   useEffect(() => {
-    // Simuler le chargement des statistiques
     setStats({
       monthlyListeners: artistData?.monthlyListeners || 1250,
       totalStreams: artistData?.totalStreams || 45600,
@@ -93,294 +295,680 @@ const ArtistDashboard = ({ artistData }) => {
   };
 
   return (
-    <div className={styles.dashboard}>
-      {/* En-tête du tableau de bord */}
-      <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <div className={styles.artistInfo}>
-            <div className={styles.artistImage}>
-              <Image
-                src={artistData?.image || "/default-artist.svg"}
-                alt="Photo de l'artiste"
-                width={80}
-                height={80}
-                className={styles.image}
-              />
-              {artistData?.verified && (
-                <div className={styles.verifiedBadge}>
-                  <Icon lib="fa-solid" name="fa-check" />
+    <div className="min-h-screen bg-white dark:bg-[#18181b] transition-colors duration-300">
+      {/* Banner avec fonctionnalité d'upload */}
+      <div className="relative w-full mx-4 mt-6 rounded-2xl overflow-hidden shadow-lg">
+        {/* Image de banner */}
+        <div className="relative h-48 md:h-64 lg:h-80">
+          <Image
+            src={bannerImage}
+            alt="Banner de l'artiste"
+            fill
+            className="object-cover"
+          />
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+
+          {/* Bouton d'édition du banner */}
+          <button
+            onClick={() => openFileSelector("banner")}
+            className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full hover:bg-black/70 transition-all duration-300 group"
+            title="Changer la photo de banner"
+          >
+            <Icon
+              lib="fa-solid"
+              name="fa-camera"
+              className="text-lg group-hover:scale-110 transition-transform"
+            />
+          </button>
+        </div>
+
+        {/* Contenu du banner */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+          <div className="flex flex-col md:flex-row items-end md:items-center justify-between gap-4">
+            {/* Profil avec photo */}
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white dark:border-[#18181b] shadow-lg">
+                  <Image
+                    src={profileImage}
+                    alt="Photo de l'artiste"
+                    width={96}
+                    height={96}
+                    className="object-cover w-full h-full"
+                  />
+                  {artistData?.verified && (
+                    <div className="absolute bottom-1 right-1 bg-green-500 text-white rounded-full p-1 text-xs">
+                      <Icon lib="fa-solid" name="fa-check" />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-            <div className={styles.artistDetails}>
-              <h1 className={styles.artistName}>
-                {artistData?.stageName || "Nom de scène"}
-              </h1>
-              <p className={styles.artistBio}>
-                {artistData?.bio || "Biographie de l'artiste"}
-              </p>
-              <div className={styles.genres}>
-                {artistData?.genres?.map((genre, index) => (
-                  <span key={index} className={styles.genreTag}>
-                    {genre}
-                  </span>
-                ))}
+                {/* Bouton d'édition du profil */}
+                <button
+                  onClick={() => openFileSelector("profile")}
+                  className="absolute -bottom-1 -right-1 bg-[#ff4545] text-white p-2 rounded-full hover:bg-[#ff3333] transition-all duration-300 group shadow-lg"
+                  title="Changer la photo de profil"
+                >
+                  <Icon
+                    lib="fa-solid"
+                    name="fa-camera"
+                    className="text-sm group-hover:scale-110 transition-transform"
+                  />
+                </button>
+              </div>
+
+              <div className="text-white">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1">
+                  {artistData?.stageName || "Nom de scène"}
+                </h2>
+                <p className="text-white/80 text-sm md:text-base">
+                  {artistData?.bio || "Biographie de l'artiste"}
+                </p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {artistData?.genres?.map((genre, index) => (
+                    <span
+                      key={index}
+                      className="bg-white/20 backdrop-blur-sm text-white px-2 md:px-3 py-1 rounded-full text-xs font-medium"
+                    >
+                      {genre}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-          <div className={styles.headerActions}>
-            <button className={styles.actionButton}>
-              <Icon lib="fa-solid" name="fa-plus" />
-              Nouveau titre
-            </button>
-            <button className={styles.actionButton}>
-              <Icon lib="fa-solid" name="fa-edit" />
-              Modifier le profil
-            </button>
+
+            {/* Actions rapides */}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="bg-[#ff4545] text-white px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold hover:scale-105 transition-all duration-300 flex items-center gap-2 text-sm md:text-base"
+              >
+                <Icon lib="fa-solid" name="fa-upload" />
+                {isMobile ? "Upload" : "Upload projet"}
+              </button>
+              {/* Bouton de test temporaire */}
+              <button
+                onClick={testGetProjects}
+                className="bg-blue-500 text-white px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold hover:scale-105 transition-all duration-300 flex items-center gap-2 text-sm md:text-base"
+              >
+                <Icon lib="fa-solid" name="fa-database" />
+                Test DB
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Statistiques principales */}
-      <div className={styles.statsGrid}>
-        <div className={styles.statCard}>
-          <div className={styles.statIcon}>
+      <div
+        className={`grid ${
+          isMobile
+            ? "grid-cols-1"
+            : isTablet
+            ? "grid-cols-2"
+            : "grid-cols-2 md:grid-cols-4"
+        } gap-4 md:gap-6 max-w-5xl mx-auto mt-6 md:mt-8 px-4`}
+      >
+        <div className="bg-white dark:bg-[#232323] rounded-2xl shadow p-4 md:p-6 flex flex-col items-center">
+          <div className="text-2xl md:text-3xl text-[#ff4545] dark:text-white mb-2">
             <Icon lib="fa-solid" name="fa-users" />
           </div>
-          <div className={styles.statContent}>
-            <h3 className={styles.statValue}>
-              {formatNumber(stats.monthlyListeners)}
-            </h3>
-            <p className={styles.statLabel}>Auditeurs mensuels</p>
+          <div className="text-xl md:text-2xl font-bold text-black dark:text-white">
+            {formatNumber(stats.monthlyListeners)}
+          </div>
+          <div className="text-gray-500 dark:text-gray-300 text-xs md:text-sm text-center">
+            Auditeurs mensuels
           </div>
         </div>
-        <div className={styles.statCard}>
-          <div className={styles.statIcon}>
+        <div className="bg-white dark:bg-[#232323] rounded-2xl shadow p-4 md:p-6 flex flex-col items-center">
+          <div className="text-2xl md:text-3xl text-[#ff4545] dark:text-white mb-2">
             <Icon lib="fa-solid" name="fa-play" />
           </div>
-          <div className={styles.statContent}>
-            <h3 className={styles.statValue}>
-              {formatNumber(stats.totalStreams)}
-            </h3>
-            <p className={styles.statLabel}>Écoutes totales</p>
+          <div className="text-xl md:text-2xl font-bold text-black dark:text-white">
+            {formatNumber(stats.totalStreams)}
+          </div>
+          <div className="text-gray-500 dark:text-gray-300 text-xs md:text-sm text-center">
+            Écoutes totales
           </div>
         </div>
-        <div className={styles.statCard}>
-          <div className={styles.statIcon}>
+        <div className="bg-white dark:bg-[#232323] rounded-2xl shadow p-4 md:p-6 flex flex-col items-center">
+          <div className="text-2xl md:text-3xl text-[#ff4545] dark:text-white mb-2">
             <Icon lib="fa-solid" name="fa-heart" />
           </div>
-          <div className={styles.statContent}>
-            <h3 className={styles.statValue}>
-              {formatNumber(stats.followers)}
-            </h3>
-            <p className={styles.statLabel}>Abonnés</p>
+          <div className="text-xl md:text-2xl font-bold text-black dark:text-white">
+            {formatNumber(stats.followers)}
+          </div>
+          <div className="text-gray-500 dark:text-gray-300 text-xs md:text-sm text-center">
+            Abonnés
           </div>
         </div>
-        <div className={styles.statCard}>
-          <div className={styles.statIcon}>
+        <div className="bg-white dark:bg-[#232323] rounded-2xl shadow p-4 md:p-6 flex flex-col items-center">
+          <div className="text-2xl md:text-3xl text-[#ff4545] dark:text-white mb-2">
             <Icon lib="fa-solid" name="fa-music" />
           </div>
-          <div className={styles.statContent}>
-            <h3 className={styles.statValue}>{stats.tracksCount}</h3>
-            <p className={styles.statLabel}>Titres publiés</p>
+          <div className="text-xl md:text-2xl font-bold text-black dark:text-white">
+            {stats.tracksCount}
+          </div>
+          <div className="text-gray-500 dark:text-gray-300 text-xs md:text-sm text-center">
+            Titres publiés
           </div>
         </div>
       </div>
 
       {/* Onglets */}
-      <div className={styles.tabs}>
+      <div className="flex flex-wrap gap-2 justify-center mt-6 md:mt-10 mb-4 md:mb-6 px-4">
         <button
-          className={`${styles.tab} ${
-            activeTab === "overview" ? styles.active : ""
+          className={`px-3 md:px-6 py-2 rounded-full font-semibold flex items-center gap-2 transition-all duration-300 text-sm md:text-base ${
+            activeTab === "overview"
+              ? "bg-[#ff4545] text-white shadow-lg"
+              : "bg-black/10 dark:bg-white/10 text-black dark:text-gray-300 hover:bg-black/20 dark:hover:bg-white/20 hover:scale-105"
           }`}
           onClick={() => setActiveTab("overview")}
         >
           <Icon lib="fa-solid" name="fa-chart-line" />
-          Vue d'ensemble
+          {isMobile ? "Vue" : "Vue d'ensemble"}
         </button>
         <button
-          className={`${styles.tab} ${
-            activeTab === "tracks" ? styles.active : ""
-          }`}
-          onClick={() => setActiveTab("tracks")}
-        >
-          <Icon lib="fa-solid" name="fa-music" />
-          Mes titres
-        </button>
-        <button
-          className={`${styles.tab} ${
-            activeTab === "albums" ? styles.active : ""
+          className={`px-3 md:px-6 py-2 rounded-full font-semibold flex items-center gap-2 transition-all duration-300 text-sm md:text-base ${
+            activeTab === "albums"
+              ? "bg-[#ff4545] text-white shadow-lg"
+              : "bg-black/10 dark:bg-white/10 text-black dark:text-gray-300 hover:bg-black/20 dark:hover:bg-white/20 hover:scale-105"
           }`}
           onClick={() => setActiveTab("albums")}
         >
           <Icon lib="fa-solid" name="fa-compact-disc" />
-          Mes albums
+          Albums
         </button>
         <button
-          className={`${styles.tab} ${
-            activeTab === "analytics" ? styles.active : ""
+          className={`px-3 md:px-6 py-2 rounded-full font-semibold flex items-center gap-2 transition-all duration-300 text-sm md:text-base ${
+            activeTab === "tracks"
+              ? "bg-[#ff4545] text-white shadow-lg"
+              : "bg-black/10 dark:bg-white/10 text-black dark:text-gray-300 hover:bg-black/20 dark:hover:bg-white/20 hover:scale-105"
+          }`}
+          onClick={() => setActiveTab("tracks")}
+        >
+          <Icon lib="fa-solid" name="fa-music" />
+          Titres
+        </button>
+        <button
+          className={`px-3 md:px-6 py-2 rounded-full font-semibold flex items-center gap-2 transition-all duration-300 text-sm md:text-base ${
+            activeTab === "analytics"
+              ? "bg-[#ff4545] text-white shadow-lg"
+              : "bg-black/10 dark:bg-white/10 text-black dark:text-gray-300 hover:bg-black/20 dark:hover:bg-white/20 hover:scale-105"
           }`}
           onClick={() => setActiveTab("analytics")}
         >
-          <Icon lib="fa-solid" name="fa-chart-bar" />
+          <Icon lib="fa-solid" name="fa-chart-pie" />
           Analytics
         </button>
       </div>
 
       {/* Contenu des onglets */}
-      <div className={styles.tabContent}>
+      <div className="max-w-5xl mx-auto bg-black/5 dark:bg-white/10 backdrop-blur-xl border border-black/10 dark:border-white/20 rounded-2xl p-4 md:p-6 shadow-xl mx-4">
         {activeTab === "overview" && (
-          <div className={styles.overview}>
-            <div className={styles.overviewGrid}>
-              <div className={styles.overviewCard}>
-                <h3>Croissance hebdomadaire</h3>
-                <div className={styles.growthIndicator}>
-                  <Icon lib="fa-solid" name="fa-arrow-up" />
-                  <span className={styles.growthValue}>
-                    +{analytics.weeklyGrowth}%
-                  </span>
+          <div>
+            <h3 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-4 md:mb-6">
+              Vue d'ensemble
+            </h3>
+            <div
+              className={`grid ${
+                isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"
+              } gap-4 md:gap-6`}
+            >
+              <div className="bg-white dark:bg-[#232323] rounded-xl p-4 md:p-6 shadow flex flex-col gap-2">
+                <div className="text-base md:text-lg font-semibold text-[#ff4545] dark:text-white mb-2">
+                  <Icon lib="fa-solid" name="fa-compact-disc" /> Albums publiés
                 </div>
-                <p>Par rapport à la semaine dernière</p>
-              </div>
-              <div className={styles.overviewCard}>
-                <h3>Top pays</h3>
-                <div className={styles.countryList}>
-                  {analytics.topCountries.map((country, index) => (
-                    <div key={index} className={styles.countryItem}>
-                      <span>{country.country}</span>
-                      <span>{country.percentage}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className={styles.overviewCard}>
-                <h3>Répartition par âge</h3>
-                <div className={styles.ageGroups}>
-                  {analytics.ageGroups.map((group, index) => (
-                    <div key={index} className={styles.ageGroup}>
-                      <span>{group.group}</span>
-                      <div className={styles.ageBar}>
-                        <div
-                          className={styles.ageBarFill}
-                          style={{ width: `${group.percentage}%` }}
-                        ></div>
+                <ul className="space-y-2">
+                  {albums.map((album) => (
+                    <li
+                      key={album.id}
+                      className="flex items-center gap-3 md:gap-4"
+                    >
+                      <Image
+                        src={album.image}
+                        alt={album.name}
+                        width={40}
+                        height={40}
+                        className="rounded-lg object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-black dark:text-white text-sm md:text-base truncate">
+                          {album.name}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-300">
+                          {album.tracks} titres • Sorti le {album.releaseDate}
+                        </div>
+                        <div className="text-xs text-[#ff4545] dark:text-white">
+                          {formatNumber(album.streams)} écoutes
+                        </div>
                       </div>
-                      <span>{group.percentage}%</span>
-                    </div>
+                    </li>
                   ))}
+                </ul>
+              </div>
+              <div className="bg-white dark:bg-[#232323] rounded-xl p-4 md:p-6 shadow flex flex-col gap-2">
+                <div className="text-base md:text-lg font-semibold text-[#ff4545] dark:text-white mb-2">
+                  <Icon lib="fa-solid" name="fa-music" /> Titres publiés
                 </div>
+                <ul className="space-y-2">
+                  {tracks.map((track) => (
+                    <li
+                      key={track.id}
+                      className="flex items-center gap-3 md:gap-4"
+                    >
+                      <Image
+                        src={track.image}
+                        alt={track.name}
+                        width={40}
+                        height={40}
+                        className="rounded object-cover"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-black dark:text-white text-sm md:text-base truncate">
+                          {track.name}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-300">
+                          {track.album} • {track.duration}
+                        </div>
+                        <div className="text-xs text-[#ff4545] dark:text-white">
+                          {formatNumber(track.streams)} écoutes
+                        </div>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
         )}
-
-        {activeTab === "tracks" && (
-          <div className={styles.tracksSection}>
-            <div className={styles.sectionHeader}>
-              <h2>Mes titres</h2>
-              <button className={styles.addButton}>
-                <Icon lib="fa-solid" name="fa-plus" />
-                Ajouter un titre
-              </button>
-            </div>
-            <div className={styles.tracksList}>
-              {tracks.map((track) => (
-                <div key={track.id} className={styles.trackItem}>
-                  <div className={styles.trackImage}>
-                    <Image
-                      src={track.image}
-                      alt={track.name}
-                      width={60}
-                      height={60}
-                      className={styles.image}
-                    />
-                  </div>
-                  <div className={styles.trackInfo}>
-                    <h4>{track.name}</h4>
-                    <p>{track.album}</p>
-                  </div>
-                  <div className={styles.trackStats}>
-                    <span>{track.duration}</span>
-                    <span>{formatNumber(track.streams)} écoutes</span>
-                  </div>
-                  <div className={styles.trackActions}>
-                    <button className={styles.actionBtn}>
-                      <Icon lib="fa-solid" name="fa-edit" />
-                    </button>
-                    <button className={styles.actionBtn}>
-                      <Icon lib="fa-solid" name="fa-trash" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {activeTab === "albums" && (
-          <div className={styles.albumsSection}>
-            <div className={styles.sectionHeader}>
-              <h2>Mes albums</h2>
-              <button className={styles.addButton}>
-                <Icon lib="fa-solid" name="fa-plus" />
-                Créer un album
-              </button>
-            </div>
-            <div className={styles.albumsGrid}>
+          <div>
+            <h3 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-4 md:mb-6">
+              Albums
+            </h3>
+            <div
+              className={`grid ${
+                isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"
+              } gap-4 md:gap-6`}
+            >
               {albums.map((album) => (
-                <div key={album.id} className={styles.albumCard}>
-                  <div className={styles.albumImage}>
-                    <Image
-                      src={album.image}
-                      alt={album.name}
-                      width={200}
-                      height={200}
-                      className={styles.image}
-                    />
-                  </div>
-                  <div className={styles.albumInfo}>
-                    <h4>{album.name}</h4>
-                    <p>
-                      {album.tracks} titres • {album.releaseDate}
-                    </p>
-                    <p>{formatNumber(album.streams)} écoutes</p>
-                  </div>
-                  <div className={styles.albumActions}>
-                    <button className={styles.actionBtn}>
-                      <Icon lib="fa-solid" name="fa-edit" />
-                    </button>
-                    <button className={styles.actionBtn}>
-                      <Icon lib="fa-solid" name="fa-trash" />
-                    </button>
+                <div
+                  key={album.id}
+                  className="bg-white dark:bg-[#232323] rounded-xl p-4 md:p-6 shadow flex gap-3 md:gap-4 items-center"
+                >
+                  <Image
+                    src={album.image}
+                    alt={album.name}
+                    width={48}
+                    height={48}
+                    className="rounded-lg object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-black dark:text-white text-base md:text-lg truncate">
+                      {album.name}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-300">
+                      {album.tracks} titres • Sorti le {album.releaseDate}
+                    </div>
+                    <div className="text-xs text-[#ff4545] dark:text-white">
+                      {formatNumber(album.streams)} écoutes
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         )}
-
+        {activeTab === "tracks" && (
+          <div>
+            <h3 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-4 md:mb-6">
+              Titres
+            </h3>
+            <div
+              className={`grid ${
+                isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"
+              } gap-4 md:gap-6`}
+            >
+              {tracks.map((track) => (
+                <div
+                  key={track.id}
+                  className="bg-white dark:bg-[#232323] rounded-xl p-4 md:p-6 shadow flex gap-3 md:gap-4 items-center"
+                >
+                  <Image
+                    src={track.image}
+                    alt={track.name}
+                    width={40}
+                    height={40}
+                    className="rounded object-cover flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-black dark:text-white text-base md:text-lg truncate">
+                      {track.name}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-300">
+                      {track.album} • {track.duration}
+                    </div>
+                    <div className="text-xs text-[#ff4545] dark:text-white">
+                      {formatNumber(track.streams)} écoutes
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         {activeTab === "analytics" && (
-          <div className={styles.analyticsSection}>
-            <h2>Analytics détaillées</h2>
-            <div className={styles.analyticsGrid}>
-              <div className={styles.analyticsCard}>
-                <h3>Évolution des écoutes</h3>
-                <div className={styles.chartPlaceholder}>
-                  <Icon lib="fa-solid" name="fa-chart-line" />
-                  <p>Graphique d'évolution</p>
+          <div>
+            <h3 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-4 md:mb-6">
+              Analytics
+            </h3>
+            <div
+              className={`grid ${
+                isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2"
+              } gap-4 md:gap-6`}
+            >
+              <div className="bg-white dark:bg-[#232323] rounded-xl p-4 md:p-6 shadow flex flex-col gap-4">
+                <div className="text-base md:text-lg font-semibold text-[#ff4545] dark:text-white mb-2">
+                  <Icon lib="fa-solid" name="fa-arrow-trend-up" /> Croissance
+                  hebdo
+                </div>
+                <div className="text-2xl md:text-3xl font-bold text-black dark:text-white">
+                  +{analytics.weeklyGrowth}%
                 </div>
               </div>
-              <div className={styles.analyticsCard}>
-                <h3>Répartition géographique</h3>
-                <div className={styles.chartPlaceholder}>
-                  <Icon lib="fa-solid" name="fa-globe" />
-                  <p>Carte des écoutes</p>
+              <div className="bg-white dark:bg-[#232323] rounded-xl p-4 md:p-6 shadow flex flex-col gap-4">
+                <div className="text-base md:text-lg font-semibold text-[#ff4545] dark:text-white mb-2">
+                  <Icon lib="fa-solid" name="fa-earth-europe" /> Top pays
                 </div>
+                <ul className="space-y-2">
+                  {analytics.topCountries.map((item, idx) => (
+                    <li key={idx} className="flex justify-between items-center">
+                      <span className="text-black dark:text-white text-sm">
+                        {item.country}
+                      </span>
+                      <span className="text-[#ff4545] dark:text-white font-bold text-sm">
+                        {item.percentage}%
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-white dark:bg-[#232323] rounded-xl p-4 md:p-6 shadow flex flex-col gap-4">
+                <div className="text-base md:text-lg font-semibold text-[#ff4545] dark:text-white mb-2">
+                  <Icon lib="fa-solid" name="fa-user-group" /> Tranches d'âge
+                </div>
+                <ul className="space-y-2">
+                  {analytics.ageGroups.map((item, idx) => (
+                    <li key={idx} className="flex justify-between items-center">
+                      <span className="text-black dark:text-white text-sm">
+                        {item.group}
+                      </span>
+                      <span className="text-[#ff4545] dark:text-white font-bold text-sm">
+                        {item.percentage}%
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Modales d'upload (optionnel) */}
+      {showBannerUpload && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#232323] rounded-2xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-black dark:text-white mb-4">
+              Changer la photo de banner
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              Sélectionnez une nouvelle image pour votre banner
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => openFileSelector("banner")}
+                className="flex-1 bg-[#ff4545] text-white px-4 py-2 rounded-lg hover:bg-[#ff3333] transition-colors"
+              >
+                Choisir une image
+              </button>
+              <button
+                onClick={() => setShowBannerUpload(false)}
+                className="flex-1 bg-gray-300 dark:bg-gray-600 text-black dark:text-white px-4 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showProfileUpload && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#232323] rounded-2xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-black dark:text-white mb-4">
+              Changer la photo de profil
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              Sélectionnez une nouvelle image pour votre profil
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => openFileSelector("profile")}
+                className="flex-1 bg-[#ff4545] text-white px-4 py-2 rounded-lg hover:bg-[#ff3333] transition-colors"
+              >
+                Choisir une image
+              </button>
+              <button
+                onClick={() => setShowProfileUpload(false)}
+                className="flex-1 bg-gray-300 dark:bg-gray-600 text-black dark:text-white px-4 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Upload Projet */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#232323] rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-black dark:text-white">
+                Upload Nouveau Projet
+              </h3>
+              <button
+                onClick={resetForm}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <Icon lib="fa-solid" name="fa-times" className="text-xl" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitProject} className="space-y-6">
+              {/* Titre du projet */}
+              <div>
+                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                  Titre du projet *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={uploadForm.title}
+                  onChange={(e) => handleFormChange("title", e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#2d2d2d] text-black dark:text-white focus:ring-2 focus:ring-[#ff4545] focus:border-transparent"
+                  placeholder="Entrez le titre de votre projet"
+                />
+              </div>
+
+              {/* Type de projet */}
+              <div>
+                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                  Type de projet *
+                </label>
+                <select
+                  required
+                  value={uploadForm.projectType}
+                  onChange={(e) =>
+                    handleFormChange("projectType", e.target.value)
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#2d2d2d] text-black dark:text-white focus:ring-2 focus:ring-[#ff4545] focus:border-transparent"
+                >
+                  <option value="single">Single</option>
+                  <option value="ep">EP</option>
+                  <option value="album">Album</option>
+                  <option value="mixtape">Mixtape</option>
+                </select>
+              </div>
+
+              {/* Collaborateurs */}
+              <div>
+                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                  Artistes en collaboration
+                </label>
+                <input
+                  type="text"
+                  value={uploadForm.collaborators}
+                  onChange={(e) =>
+                    handleFormChange("collaborators", e.target.value)
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#2d2d2d] text-black dark:text-white focus:ring-2 focus:ring-[#ff4545] focus:border-transparent"
+                  placeholder="Séparez les noms par des virgules"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={uploadForm.description}
+                  onChange={(e) =>
+                    handleFormChange("description", e.target.value)
+                  }
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#2d2d2d] text-black dark:text-white focus:ring-2 focus:ring-[#ff4545] focus:border-transparent resize-none"
+                  placeholder="Décrivez votre projet..."
+                />
+              </div>
+
+              {/* Upload Audio */}
+              <div>
+                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                  Fichier Audio *
+                </label>
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-[#ff4545] transition-colors">
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    required
+                    onChange={(e) => handleFileUpload(e, "audio")}
+                    className="hidden"
+                    id="audio-upload"
+                  />
+                  <label htmlFor="audio-upload" className="cursor-pointer">
+                    <Icon
+                      lib="fa-solid"
+                      name="fa-music"
+                      className="text-4xl text-gray-400 mb-2"
+                    />
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {uploadForm.audioFile
+                        ? uploadForm.audioFile.name
+                        : "Cliquez pour sélectionner un fichier audio"}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                      MP3, WAV, FLAC (max 50MB)
+                    </p>
+                  </label>
+                </div>
+                {uploadForm.audioPreview && (
+                  <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <p className="text-green-700 dark:text-green-300 text-sm">
+                      ✓ Fichier audio sélectionné
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Image */}
+              <div>
+                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                  Image du projet
+                </label>
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-[#ff4545] transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload(e, "image")}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label htmlFor="image-upload" className="cursor-pointer">
+                    <Icon
+                      lib="fa-solid"
+                      name="fa-image"
+                      className="text-4xl text-gray-400 mb-2"
+                    />
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {uploadForm.imageFile
+                        ? uploadForm.imageFile.name
+                        : "Cliquez pour sélectionner une image"}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                      JPG, PNG, GIF (max 5MB)
+                    </p>
+                  </label>
+                </div>
+                {uploadForm.imagePreview && (
+                  <div className="mt-2">
+                    <img
+                      src={uploadForm.imagePreview}
+                      alt="Aperçu"
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Boutons d'action */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={isUploading}
+                  className="flex-1 bg-[#ff4545] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#ff3333] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isUploading ? (
+                    <>
+                      <Icon
+                        lib="fa-solid"
+                        name="fa-spinner"
+                        className="animate-spin"
+                      />
+                      Upload en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Icon lib="fa-solid" name="fa-upload" />
+                      Upload le projet
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="flex-1 bg-gray-300 dark:bg-gray-600 text-black dark:text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

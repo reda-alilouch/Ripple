@@ -146,6 +146,27 @@ export const getSpotifyTracks = async () => {
       duration: track.duration_ms,
       previewUrl: track.preview_url,
     }));
+
+ return tracks.map(track => ({
+ spotifyId: track.id,
+      name: track.name,
+      uri: track.uri, // This is crucial for playback
+      preview_url: track.preview_url,
+      duration_ms: track.duration_ms,
+      explicit: track.explicit,
+      popularity: track.popularity,
+      artists: track.artists.map(artist => ({
+        id: artist.id,
+        name: artist.name,
+        uri: artist.uri
+      })),
+      album: {
+        id: track.album.id,
+        name: track.album.name,
+        images: track.album.images,
+        uri: track.album.uri
+      }
+    }));
 };
 
 // Récupérer des artistes populaires avec pagination

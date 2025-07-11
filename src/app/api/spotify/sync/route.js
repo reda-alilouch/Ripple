@@ -2,19 +2,15 @@ import { NextResponse } from "next/server";
 import { Track, Artist, Playlist, Album } from "@/models/spotify";
 import { getAccessToken } from "@/lib/spotify";
 import connectMongoDB from "@/lib/mongodb";
+import axios from "axios";
 
 async function fetchSpotifyData(endpoint, accessToken) {
-  const response = await fetch(`https://api.spotify.com/v1${endpoint}`, {
+  const response = await axios.get(`https://api.spotify.com/v1${endpoint}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-
-  if (!response.ok) {
-    throw new Error(`Erreur Spotify API: ${response.statusText}`);
-  }
-
-  return response.json();
+  return response.data;
 }
 
 async function syncAlbums(accessToken) {

@@ -1,14 +1,20 @@
 "use client";
+
+import tracks from "@/hooks/useSpotifyPlayer"
+import playlistId from "@/hooks/useSpotifyPlayer"
 import Header from "@/features/Header/Header";
 import Aside from "@/features/Aside";
 import Footer from "@/features/Footer/FooterClient";
 import Audio from "@/features/Audio/Audio";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import axios from "axios";
+import { useSession } from "next-auth/react";
 
 export default function TemplateClient({ children }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const { data: session, status } = useSession();
 
   const [mounted, setMounted] = useState(false);
   const params = useParams();
@@ -33,7 +39,7 @@ export default function TemplateClient({ children }) {
           <Footer />
         </main>
       </div>
-      <Audio />
+      {session && <Audio tracks={tracks} playlistId={playlistId} />}
     </div>
   );
 }

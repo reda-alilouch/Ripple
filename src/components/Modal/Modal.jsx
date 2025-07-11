@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -22,14 +22,48 @@ const ensureMongoConnection = async () => {
   }
 };
 
+// Configuration Spotify
+const SPOTIFY_CONFIG = {
+  clientId: process.env.NEXT_PUBLIC_SPOTIFY_CLIENT_ID,
+  redirectUri: process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI || 'http://localhost:3000/callback',
+  scopes: [
+    'streaming',
+    'user-read-email',
+    'user-read-private',
+    'user-read-playback-state',
+    'user-modify-playback-state',
+    'user-read-currently-playing',
+    'playlist-read-private',
+    'playlist-read-collaborative'
+  ].join(' ')
+};
+
 export default function Modal({ isOpen, closeModal }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [spotifyPlayer, setSpotifyPlayer] = useState(null);
+  const [spotifyReady, setSpotifyReady] = useState(false);
 
   const router = useRouter();
+
+  // Initialiser le Spotify Web SDK
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.Spotify) {
+      const script = document.createElement('script');
+      script.src = 'https://sdk.scdn.co/spotify-player.js';
+      script.async = true;
+      document.body.appendChild(script);
+
+      window.onSpotifyWebPlaybackSDKReady = () => {
+        setSpotifyReady(true);
+      };
+    } else if (window.Spotify) {
+      setSpotifyReady(true);
+    }
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -95,6 +129,66 @@ export default function Modal({ isOpen, closeModal }) {
     }
   };
 
+  const handleSpotifyAuth = async () => {
+    setError("");
+    setIsLoading(true);
+    
+    try {
+      // Générer un state pour la sécurité
+      const state = Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('spotify_auth_state', state);
+      
+      // Construire l'URL d'autorisation Spotify
+      const authUrl = new URL('https://accounts.spotify.com/authorize');
+      authUrl.searchParams.append('client_id', SPOTIFY_CONFIG.clientId);
+      authUrl.searchParams.append('response_type', 'code');
+      authUrl.searchParams.append('redirect_uri', SPOTIFY_CONFIG.redirectUri);
+      authUrl.searchParams.append('scope', SPOTIFY_CONFIG.scopes);
+      authUrl.searchParams.append('state', state);
+      
+      // Rediriger vers Spotify
+      window.location.href = authUrl.toString();
+    } catch (err) {
+      setError("Erreur lors de la connexion avec Spotify");
+      setIsLoading(false);
+    }
+  };
+
+  const initializeSpotifyPlayer = async (accessToken) => {
+    if (!spotifyReady || !window.Spotify) return;
+
+    const player = new window.Spotify.Player({
+      name: 'Your App Player',
+      getOAuthToken: cb => { cb(accessToken); },
+      volume: 0.5
+    });
+
+    // Gestionnaires d'événements
+    player.addListener('ready', ({ device_id }) => {
+      console.log('Ready with Device ID', device_id);
+    });
+
+    player.addListener('not_ready', ({ device_id }) => {
+      console.log('Device ID has gone offline', device_id);
+    });
+
+    player.addListener('initialization_error', ({ message }) => {
+      console.error('Failed to initialize', message);
+    });
+
+    player.addListener('authentication_error', ({ message }) => {
+      console.error('Failed to authenticate', message);
+    });
+
+    player.addListener('account_error', ({ message }) => {
+      console.error('Failed to validate Spotify account', message);
+    });
+
+    // Connecter le player
+    await player.connect();
+    setSpotifyPlayer(player);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -121,6 +215,15 @@ export default function Modal({ isOpen, closeModal }) {
             <i className="fab fa-google text-xl"></i>
             Continuer avec Google
           </button>
+
+          <button
+            onClick={handleSpotifyAuth}
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-[#1DB954] text-white rounded-lg hover:bg-[#1ed760] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <i className="fab fa-spotify text-xl"></i>
+            Continuer avec Spotify
+          </button>
         </div>
 
         <div className="relative mb-6">
@@ -146,7 +249,7 @@ export default function Modal({ isOpen, closeModal }) {
                 placeholder="Nom complet"
                 required
                 disabled={isLoading}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF4545] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg text-black bg-white dark:bg-gray-800 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF4545] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
           )}
@@ -161,7 +264,7 @@ export default function Modal({ isOpen, closeModal }) {
               placeholder="Email"
               required
               disabled={isLoading}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF4545] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg text-black bg-white dark:bg-gray-800 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF4545] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -175,7 +278,7 @@ export default function Modal({ isOpen, closeModal }) {
               placeholder="Mot de passe"
               required
               disabled={isLoading}
-              className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF4545] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-700 rounded-lg text-black bg-white dark:bg-gray-800 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF4545] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <button
               type="button"
@@ -231,27 +334,3 @@ export default function Modal({ isOpen, closeModal }) {
     </div>
   );
 }
-/*
-Ce modal gère l'authentification avec le flux suivant :
-
-1. Lors de l'inscription (bouton "S'inscrire") :
-   - Les données du formulaire (nom, email, mot de passe) sont envoyées à /api/auth/signup
-   - L'API crée un nouvel utilisateur dans MongoDB
-   - Si succès : affiche message "✅ Inscription réussie !"
-   - Bascule automatiquement vers le formulaire de connexion
-   - L'utilisateur doit alors se connecter avec ses identifiants
-
-2. Lors de la connexion :
-   - Vérifie les identifiants avec NextAuth
-   - Si valides : redirige vers /profil
-   - Si invalides : affiche message d'erreur
-
-Le stockage en base de données se fait uniquement à l'inscription.
-La connexion ne fait que vérifier les données existantes.
-
-Flux technique inscription -> connexion :
-1. POST /api/auth/signup (stockage MongoDB)
-2. Retour au formulaire connexion
-3. Authentification via NextAuth
-4. Redirection profil
-*/

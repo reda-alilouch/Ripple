@@ -1,11 +1,13 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Icon from "@/components/Icon";
 import styles from "./profil.module.css";
 import Notification from "./Notification";
 import RoleSelector from "@/components/RoleSelector/RoleSelector";
 import ArtistDashboard from "@/components/ArtistDashboard/ArtistDashboard";
+import { signOut, useSession } from "next-auth/react";
+import axios from "axios";
 
 const ProfilClient = ({ userData }) => {
   const [activeTab, setActiveTab] = useState("historique");
@@ -15,33 +17,20 @@ const ProfilClient = ({ userData }) => {
   const [notification, setNotification] = useState(null);
   const [showRoleSelector, setShowRoleSelector] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const bannerInputRef = useRef(null);
 
-  // Charger l'image de bannière depuis la base de données
-  useEffect(() => {
-    const loadBannerImage = async () => {
-      try {
-        const response = await fetch("/api/profile/banner");
-        if (response.ok) {
-          const data = await response.json();
-          if (data.bannerImage) {
-            setBannerImage(data.bannerImage);
-          }
-        }
-      } catch (error) {
-        console.error("Erreur lors du chargement de la bannière:", error);
-      }
-    };
-
-    loadBannerImage();
-  }, []);
+  // Ajout de la session NextAuth côté client
+  const { data: session, update } = useSession
+    ? useSession()
+    : { data: null, update: null };
 
   // Charger le rôle de l'utilisateur
   useEffect(() => {
     const loadUserRole = async () => {
       try {
-        const response = await fetch("/api/user/role");
-        if (response.ok) {
-          const data = await response.json();
+        const response = await axios.get("/api/user/role");
+        if (response.data.ok) {
+          const data = response.data;
           setUserRole(data.role);
           if (data.role === "listener" && !data.hasProfile) {
             setShowRoleSelector(true);
@@ -132,110 +121,6 @@ const ProfilClient = ({ userData }) => {
     playlistsCreees: 8,
   };
 
-  // Fonction pour gérer le téléchargement de l'image de bannière
-  const handleBannerUpload = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // Validation du type de fichier
-      const allowedTypes = [
-        "image/jpeg",
-        "image/jpg",
-        "image/png",
-        "image/webp",
-      ];
-      if (!allowedTypes.includes(file.type)) {
-        setNotification({
-          message:
-            "Veuillez sélectionner une image au format JPEG, PNG ou WebP",
-          type: "error",
-        });
-        return;
-      }
-
-      // Validation de la taille (max 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      if (file.size > maxSize) {
-        setNotification({
-          message: "L'image doit faire moins de 5MB",
-          type: "error",
-        });
-        return;
-      }
-
-      setIsUploading(true);
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const imageData = e.target.result;
-        setBannerImage(imageData);
-        setShowBannerUpload(false);
-
-        // Sauvegarder dans la base de données
-        try {
-          const response = await fetch("/api/profile/banner", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ bannerImage: imageData }),
-          });
-
-          if (!response.ok) {
-            console.error("Erreur lors de la sauvegarde de la bannière");
-            setNotification({
-              message: "Erreur lors de la sauvegarde de la bannière",
-              type: "error",
-            });
-          } else {
-            setNotification({
-              message: "Bannière mise à jour avec succès !",
-              type: "success",
-            });
-          }
-        } catch (error) {
-          console.error("Erreur lors de la sauvegarde:", error);
-          setNotification({
-            message: "Erreur lors de la sauvegarde",
-            type: "error",
-          });
-        } finally {
-          setIsUploading(false);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Fonction pour supprimer l'image de bannière
-  const handleRemoveBanner = async () => {
-    setBannerImage(null);
-
-    // Supprimer de la base de données
-    try {
-      const response = await fetch("/api/profile/banner", {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        console.error("Erreur lors de la suppression de la bannière");
-        setNotification({
-          message: "Erreur lors de la suppression de la bannière",
-          type: "error",
-        });
-      } else {
-        setNotification({
-          message: "Bannière supprimée avec succès !",
-          type: "success",
-        });
-      }
-    } catch (error) {
-      console.error("Erreur lors de la suppression:", error);
-      setNotification({
-        message: "Erreur lors de la suppression",
-        type: "error",
-      });
-    }
-  };
-
   // Fonction pour gérer la sélection de rôle
   const handleRoleSelected = (role) => {
     setUserRole(role);
@@ -251,8 +136,8 @@ const ProfilClient = ({ userData }) => {
   // Fonction de test pour vérifier le rôle
   const testUserRole = async () => {
     try {
-      const response = await fetch("/api/user/role");
-      const data = await response.json();
+      const response = await axios.get("/api/user/role");
+      const data = response.data;
       console.log("Rôle utilisateur:", data);
       setNotification({
         message: `Rôle actuel: ${data.role || "Non défini"}`,
@@ -270,8 +155,8 @@ const ProfilClient = ({ userData }) => {
   // Fonction de diagnostic complète
   const runDiagnostic = async () => {
     try {
-      const response = await fetch("/api/user/role/test");
-      const data = await response.json();
+      const response = await axios.get("/api/user/role/test");
+      const data = response.data;
       console.log("Diagnostic complet:", data);
 
       if (data.success) {
@@ -298,8 +183,143 @@ const ProfilClient = ({ userData }) => {
     }
   };
 
+  // Handler pour la photo de profil
+  const handleProfileImageChange = async (e) => {
+    console.log("Profile input triggered");
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validation type et taille
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setNotification({ type: "error", message: "Format non supporté" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setNotification({
+        type: "error",
+        message: "Image trop lourde (max 5Mo)",
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const imageData = event.target.result;
+      try {
+        const response = await axios.post(
+          "/api/profile/image",
+          { image: imageData },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        const data = response.data;
+        if (data.success) {
+          setNotification({ type: "success", message: "Photo mise à jour !" });
+          // Rafraîchir la session NextAuth pour mettre à jour l'image partout
+          if (typeof update === "function") {
+            await update();
+          } else {
+            await signOut({ redirect: false });
+            window.location.reload();
+          }
+        } else {
+          setNotification({
+            type: "error",
+            message: data.error || "Erreur serveur",
+          });
+        }
+      } catch {
+        setNotification({ type: "error", message: "Erreur réseau" });
+      } finally {
+        setIsUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handler pour l'upload de la bannière
+  const handleBannerUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    // Validation type et taille
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      setNotification({ type: "error", message: "Format non supporté" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setNotification({
+        type: "error",
+        message: "Image trop lourde (max 5Mo)",
+      });
+      return;
+    }
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const imageData = e.target.result;
+      setBannerImage(imageData);
+      setShowBannerUpload(false);
+      try {
+        const response = await axios.post(
+          "/api/profile/banner",
+          { bannerImage: imageData },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        if (!response.data.ok) {
+          setNotification({
+            message: "Erreur lors de la sauvegarde de la bannière",
+            type: "error",
+          });
+        } else {
+          setNotification({
+            message: "Bannière mise à jour avec succès !",
+            type: "success",
+          });
+        }
+      } catch (error) {
+        setNotification({
+          message: "Erreur lors de la sauvegarde",
+          type: "error",
+        });
+      } finally {
+        setIsUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handler pour supprimer la bannière
+  const handleRemoveBanner = async () => {
+    setBannerImage(null);
+    try {
+      const response = await axios.delete("/api/profile/banner");
+      if (!response.data.ok) {
+        setNotification({
+          message: "Erreur lors de la suppression de la bannière",
+          type: "error",
+        });
+      } else {
+        setNotification({
+          message: "Bannière supprimée avec succès !",
+          type: "success",
+        });
+      }
+    } catch (error) {
+      setNotification({
+        message: "Erreur lors de la suppression",
+        type: "error",
+      });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
+    <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
       {/* Afficher le tableau de bord artiste si l'utilisateur est un artiste */}
       {userRole === "artist" ? (
         <ArtistDashboard artistData={userData} />
@@ -326,71 +346,28 @@ const ProfilClient = ({ userData }) => {
 
             {/* Contrôles de la bannière */}
             <div className="absolute top-4 right-4 flex gap-2">
-              {!showBannerUpload ? (
-                <>
-                  <button
-                    onClick={() => setShowBannerUpload(true)}
-                    className="bg-black/10 dark:bg-white/15 backdrop-blur-sm border border-black/20 dark:border-white/20 text-white p-2 rounded-full transition-all duration-300 hover:bg-black/20 dark:hover:bg-white/25 hover:transform hover:translate-y-[-1px] cursor-pointer"
-                    title="Modifier la bannière"
-                  >
-                    <Icon lib="fa-solid" name="fa-camera" className="text-sm" />
-                  </button>
-                  {bannerImage && (
-                    <button
-                      onClick={handleRemoveBanner}
-                      className="bg-red-500/80 hover:bg-red-600 text-white p-2 rounded-full transition-colors"
-                      title="Supprimer la bannière"
-                    >
-                      <Icon
-                        lib="fa-solid"
-                        name="fa-trash"
-                        className="text-sm"
-                      />
-                    </button>
-                  )}
-                </>
-              ) : (
-                <div className="bg-black/10 dark:bg-white/20 backdrop-blur-md border border-black/20 dark:border-white/30 rounded-lg p-2 flex gap-2 shadow-lg">
-                  <label
-                    className={`bg-[#ff4545] hover:bg-[#ff6666] text-white px-3 py-1 rounded cursor-pointer text-sm transition-all duration-300 hover:transform hover:translate-y-[-1px] hover:shadow-lg ${
-                      isUploading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    {isUploading ? (
-                      <>
-                        <Icon
-                          lib="fa-solid"
-                          name="fa-spinner"
-                          className="mr-1 animate-spin"
-                        />
-                        Envoi...
-                      </>
-                    ) : (
-                      <>
-                        <Icon
-                          lib="fa-solid"
-                          name="fa-upload"
-                          className="mr-1"
-                        />
-                        Choisir
-                      </>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleBannerUpload}
-                      className="hidden"
-                      disabled={isUploading}
-                    />
-                  </label>
-                  <button
-                    onClick={() => setShowBannerUpload(false)}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm"
-                    disabled={isUploading}
-                  >
-                    Annuler
-                  </button>
-                </div>
+              <label
+                htmlFor="banner-upload-input"
+                className="absolute z-10 top-2 right-2 bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-full transition-colors cursor-pointer"
+              >
+                <Icon lib="fa-solid" name="fa-camera" className="text-sm" />
+              </label>
+              <input
+                id="banner-upload-input"
+                type="file"
+                accept="image/*"
+                ref={bannerInputRef}
+                onChange={handleBannerUpload}
+                className="hidden"
+              />
+              {bannerImage && (
+                <button
+                  onClick={handleRemoveBanner}
+                  className="bg-red-500/80 hover:bg-red-600 text-white absolute z-10 top-2 right-10 p-2 rounded-full transition-colors"
+                  title="Supprimer la bannière"
+                >
+                  <Icon lib="fa-solid" name="fa-trash" className="text-sm" />
+                </button>
               )}
             </div>
 
@@ -416,20 +393,34 @@ const ProfilClient = ({ userData }) => {
                   <div className="relative">
                     <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-black/20 dark:border-white/30 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-3xl">
                       <Image
-                        src={userData.image || "/default-artist.svg"}
+                        src={
+                          session?.user?.image ||
+                          userData.image ||
+                          "/default-artist.svg"
+                        }
                         alt="Photo de profil"
                         width={160}
                         height={160}
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <button className="absolute bottom-2 right-2 bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-full transition-colors">
+                    <label
+                      htmlFor="profile-upload-input"
+                      className="absolute bottom-2 right-2 bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-full transition-colors cursor-pointer"
+                    >
                       <Icon
                         lib="fa-solid"
                         name="fa-camera"
                         className="text-sm"
                       />
-                    </button>
+                    </label>
+                    <input
+                      id="profile-upload-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfileImageChange}
+                      className="hidden"
+                    />
                   </div>
 
                   {/* Informations utilisateur */}

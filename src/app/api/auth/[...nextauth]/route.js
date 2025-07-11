@@ -1,15 +1,28 @@
 import NextAuth from "next-auth";
-import { authConfig } from "../config/auth.config";
+import SpotifyProvider from "next-auth/providers/spotify";
 
-export const runtime = "nodejs";
+const handler = NextAuth({
+  providers: [
+    SpotifyProvider({
+      clientId: process.env.SPOTIFY_CLIENT_ID,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+      authorization: 'https://accounts.spotify.com/authorize?scope=user-read-email,user-read-private,user-top-read,streaming,user-read-playback-state,user-modify-playback-state'
 
-const handler = NextAuth(authConfig);
+    })
+  ],
+  callbacks: {
+    async jwt({ token, account }) {
+      if (account) {
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.accessToken = token.accessToken;
+      return session;
+    }
+  }
+});
 
 export { handler as GET, handler as POST };
-
-// Ajout des autres méthodes HTTP pour éviter l'erreur 405
-export const PUT = handler;
-export const DELETE = handler;
-export const PATCH = handler;
-export const HEAD = handler;
-export const OPTIONS = handler;

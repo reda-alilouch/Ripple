@@ -40,6 +40,10 @@ export async function POST(request) {
     if (!user.role) {
       user.role = "listener";
       await user.save();
+      console.log(
+        "Champ role initialisé à 'listener' pour l'utilisateur:",
+        user.email
+      );
     }
 
     // Vérifier si l'utilisateur a déjà un rôle défini (autre que listener)
@@ -52,7 +56,6 @@ export async function POST(request) {
 
     // Mettre à jour le rôle de l'utilisateur
     user.role = role;
-    await user.save();
 
     // Créer le profil correspondant selon le rôle
     if (role === "artist") {
@@ -63,28 +66,17 @@ export async function POST(request) {
         );
       }
 
-      // Vérifier si le nom de scène est déjà pris
-      const existingArtist = await ArtistUser.findOne({
-        stageName: profileData.stageName,
+      // Vérifier si le nom de scène est déjà pris par un autre utilisateur
+      const existingArtist = await User.findOne({
+        "artistProfile.stageName": profileData.stageName,
+        _id: { $ne: user._id },
       });
-
       if (existingArtist) {
         return NextResponse.json(
           { success: false, error: "Ce nom de scène est déjà utilisé" },
           { status: 409 }
         );
       }
-
-      // Créer le profil artiste
-      const artistProfile = new ArtistUser({
-        userId: user._id,
-        stageName: profileData.stageName,
-        bio: profileData.bio || "",
-        genres: profileData.genres,
-        socialLinks: profileData.socialLinks || {},
-      });
-
-      await artistProfile.save();
 
       // Mettre à jour le profil utilisateur avec les données artiste
       user.artistProfile = {
@@ -93,22 +85,14 @@ export async function POST(request) {
         genres: profileData.genres,
         socialLinks: profileData.socialLinks || {},
       };
-      await user.save();
     } else if (role === "listener") {
-      // Créer le profil auditeur
-      const listenerProfile = new ListenerUser({
-        userId: user._id,
-        favoriteGenres: profileData?.favoriteGenres || [],
-      });
-
-      await listenerProfile.save();
-
       // Mettre à jour le profil utilisateur avec les données auditeur
       user.listenerProfile = {
         favoriteGenres: profileData?.favoriteGenres || [],
       };
-      await user.save();
     }
+
+    await user.save();
 
     // Avant de retourner l'utilisateur, le convertir en objet simple
     const userObj = user.toObject ? user.toObject() : user;
@@ -121,7 +105,7 @@ export async function POST(request) {
       user: userObj,
     });
   } catch (error) {
-    console.error("Erreur lors de la création du rôle:", error);
+    console.error("Erreur lors de la création du rôle:", error, error?.stack);
     return NextResponse.json(
       { success: false, error: "Erreur interne du serveur" },
       { status: 500 }
