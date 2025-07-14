@@ -5,7 +5,6 @@ import ProfilClient from "./ProfilClient";
 
 export default async function Profil() {
   const session = await getServerSession();
-
   if (!session) {
     return (
       <div className="min-h-screen bg-[#1a1a1a] flex items-center justify-center">

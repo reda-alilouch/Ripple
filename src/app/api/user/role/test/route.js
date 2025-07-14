@@ -7,9 +7,6 @@ import { authConfig } from "@/app/api/auth/config/auth.config";
 export async function GET(request) {
   try {
     const session = await getServerSession(authConfig);
-
-    console.log("Session:", session);
-
     if (!session) {
       return NextResponse.json(
         {
@@ -24,19 +21,6 @@ export async function GET(request) {
     await connectMongoDB();
 
     const user = await User.findById(session.user.id);
-    console.log(
-      "Utilisateur trouvé:",
-      user
-        ? {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            hasArtistProfile: !!user.artistProfile,
-            hasListenerProfile: !!user.listenerProfile,
-          }
-        : null
-    );
 
     if (!user) {
       return NextResponse.json(
@@ -54,7 +38,6 @@ export async function GET(request) {
     if (!user.role) {
       user.role = "listener";
       await user.save();
-      console.log("Rôle initialisé comme listener");
     }
 
     return NextResponse.json({

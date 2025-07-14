@@ -2,21 +2,10 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
-// Chargement des variables d’environnement
+// Charger les variables d'environnement
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, "../../.env.local") });
-
-console.log("📦 Chargement des variables d'environnement...");
-console.log("MONGODB_URI:", process.env.MONGODB_URI ? "✓ OK" : "✗ Manquant");
-console.log(
-  "SPOTIFY_CLIENT_ID:",
-  process.env.SPOTIFY_CLIENT_ID ? "✓ OK" : "✗ Manquant"
-);
-console.log(
-  "SPOTIFY_CLIENT_SECRET:",
-  process.env.SPOTIFY_CLIENT_SECRET ? "✓ OK" : "✗ Manquant"
-);
 
 import { connectMongoDB } from "../lib/mongodb.js";
 import Titre from "../models/Titre.js";
@@ -30,131 +19,117 @@ import {
   getSpotifyPlaylists,
 } from "../lib/spotify.js";
 
+// MODIFIE ICI pour ta playlist et ton market
+const playlistId = "37i9dQZF1DXcBWIGoYBM5M"; // ID d'une playlist publique confirmée
+const market = "FR"; // Région France
+
 async function syncAll() {
   try {
     await connectMongoDB();
-    console.log("✅ Connexion à MongoDB établie");
 
-    // 🔹 Synchronisation des titres
-    console.log("\n🎵 Extraction des titres depuis l’API Spotify...");
-    const tracks = await getSpotifyTracks();
-    console.log(`📥 ${tracks.length} titres récupérés.`);
-
-    for (const [index, track] of tracks.entries()) {
+    const tracks = await getSpotifyTracks(playlistId, market);
+    for (const track of tracks) {
+      const t = track.track;
+      if (!t) continue;
       const trackData = {
-        ...track,
-        uri: track.uri || `spotify:track:${track.spotifyId}`,
-        previewUrl: track.preview_url || null,
-        image: track.album?.images?.[0]?.url || track.image || "",
-        artists: track.artists || [],
+        spotifyId: t.id,
+        uri: t.uri,
+        preview_url: t.preview_url || null,
+        image: t.album?.images?.[0]?.url || "",
+        artists: t.artists?.map((a) => a.name) || [],
         album: {
-          id: track.album?.id || null,
-          name: track.album?.name || "",
-          images: track.album?.images || [],
+          id: t.album?.id || null,
+          name: t.album?.name || "",
+          images: t.album?.images || [],
         },
-        duration_ms: track.duration_ms || 0,
-        explicit: track.explicit || false,
-        popularity: track.popularity || 0,
-        name: track.name || "Unknown Track",
+        duration_ms: t.duration_ms || 0,
+        explicit: t.explicit || false,
+        popularity: t.popularity || 0,
+        name: t.name || "Unknown Track",
       };
-
       await Titre.updateOne(
-        { spotifyId: track.spotifyId },
+        { spotifyId: t.id },
         { $set: trackData },
         { upsert: true }
       );
-
-      if ((index + 1) % 10 === 0 || index === tracks.length - 1) {
-        console.log(`✔️ Titres enregistrés : ${index + 1}/${tracks.length}`);
-      }
     }
 
-    // 🔹 Synchronisation des artistes
-    console.log("\n🎤 Extraction des artistes...");
-    const artists = await getSpotifyArtists();
-    console.log(`📥 ${artists.length} artistes récupérés.`);
-
-    for (const [index, artist] of artists.entries()) {
+    // Récupère tous les IDs d'artistes uniques des tracks
+    const artistIds = [
+      ...new Set(
+        tracks
+          .map((track) => track.track?.artists?.map((a) => a.id))
+          .flat()
+          .filter(Boolean)
+      ),
+    ];
+    const artists = await getSpotifyArtists(artistIds, market);
+    for (const artist of artists) {
+      if (!artist) continue;
       const artistData = {
-        ...artist,
-        image: artist.images?.[0]?.url || artist.image || "",
-        uri: artist.uri || `spotify:artist:${artist.spotifyId}`,
+        spotifyId: artist.id,
+        name: artist.name,
+        genres: artist.genres,
+        image: artist.images?.[0]?.url || "",
         followers: artist.followers?.total || 0,
         popularity: artist.popularity || 0,
-        genres: artist.genres || [],
+        uri: artist.uri,
       };
-
       await Artiste.updateOne(
-        { spotifyId: artist.spotifyId },
+        { spotifyId: artist.id },
         { $set: artistData },
         { upsert: true }
       );
-
-      if ((index + 1) % 10 === 0 || index === artists.length - 1) {
-        console.log(`✔️ Artistes enregistrés : ${index + 1}/${artists.length}`);
-      }
     }
-
-    // 🔹 Synchronisation des albums
-    console.log("\n💿 Extraction des albums...");
-    const albums = await getSpotifyAlbums();
-    console.log(`📥 ${albums.length} albums récupérés.`);
-
-    for (const [index, album] of albums.entries()) {
+    // Récupère tous les IDs d'albums uniques des tracks
+    const albumIds = [
+      ...new Set(tracks.map((track) => track.track?.album?.id).filter(Boolean)),
+    ];
+    const albums = await getSpotifyAlbums(albumIds, market);
+    for (const album of albums) {
+      if (!album) continue;
       const albumData = {
-        ...album,
-        image: album.images?.[0]?.url || album.image || "",
-        uri: album.uri || `spotify:album:${album.spotifyId}`,
-        artists: album.artists || [],
-        release_date: album.release_date || null,
-        total_tracks: album.total_tracks || 0,
-        album_type: album.album_type || "album",
+        spotifyId: album.id,
+        name: album.name,
+        artists: album.artists?.map((a) => a.name) || [],
+        release_date: album.release_date,
+        image: album.images?.[0]?.url || "",
+        total_tracks: album.total_tracks,
+        album_type: album.album_type,
+        uri: album.uri,
       };
-
       await Album.updateOne(
-        { spotifyId: album.spotifyId },
+        { spotifyId: album.id },
         { $set: albumData },
         { upsert: true }
       );
-
-      if ((index + 1) % 10 === 0 || index === albums.length - 1) {
-        console.log(`✔️ Albums enregistrés : ${index + 1}/${albums.length}`);
-      }
     }
 
-    // 🔹 Synchronisation des playlists
-    console.log("\n📚 Extraction des playlists...");
-    const playlists = await getSpotifyPlaylists();
-    console.log(`📥 ${playlists.length} playlists récupérées.`);
-
-    for (const [index, playlist] of playlists.entries()) {
+    const playlists = await getSpotifyPlaylists([playlistId], market);
+    for (const playlist of playlists) {
+      if (!playlist) continue;
       const playlistData = {
-        ...playlist,
-        image: playlist.images?.[0]?.url || playlist.image || "",
-        uri: playlist.uri || `spotify:playlist:${playlist.spotifyId}`,
-        tracks: playlist.tracks || [],
-        total_tracks: playlist.tracks?.total || 0,
-        public: playlist.public || false,
-        collaborative: playlist.collaborative || false,
+        spotifyId: playlist.id,
+        name: playlist.name,
         description: playlist.description || "",
+        owner: playlist.owner?.display_name || "",
+        tracks:
+          playlist.tracks?.items
+            ?.map((item) => item.track?.id)
+            .filter(Boolean) || [],
+        image: playlist.images?.[0]?.url || "",
+        public: playlist.public,
+        collaborative: playlist.collaborative,
+        uri: playlist.uri,
       };
-
       await Playlist.updateOne(
-        { spotifyId: playlist.spotifyId },
+        { spotifyId: playlist.id },
         { $set: playlistData },
         { upsert: true }
       );
-
-      if ((index + 1) % 5 === 0 || index === playlists.length - 1) {
-        console.log(
-          `✔️ Playlists enregistrées : ${index + 1}/${playlists.length}`
-        );
-      }
     }
-
-    console.log("\n🎉 Synchronisation terminée avec succès !");
   } catch (error) {
-    console.error("❌ Échec de la synchronisation :", error);
+    console.error("❌ Sync failed:", error.response?.data || error.message);
     process.exit(1);
   }
 }

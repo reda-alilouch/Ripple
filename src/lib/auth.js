@@ -1,65 +1,64 @@
-import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
-if (!process.env.JWT_SECRET) {
-  throw new Error("Please add your JWT_SECRET to .env.local");
-}
-
-// Générer un token JWT
-export function generateToken(payload) {
-  return jwt.sign(payload, process.env.JWT_SECRET, {
-    expiresIn: "7d", // Le token expire après 7 jours
-  });
-}
-
-// Vérifier un token JWT
-export function verifyToken(token) {
+/**
+ * Hasher un mot de passe
+ * @param {string} password - Le mot de passe à hasher
+ * @returns {Promise<string>} - Le mot de passe hashé
+ */
+export async function hashPassword(password) {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET);
+    const saltRounds = 12;
+    return await bcrypt.hash(password, saltRounds);
   } catch (error) {
-    return null;
+    throw new Error("Erreur lors du hashage du mot de passe");
   }
 }
 
-// Hasher un mot de passe
-export async function hashPassword(password) {
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-  return hashedPassword;
-}
-
-// Comparer un mot de passe
+/**
+ * Comparer un mot de passe avec son hash
+ * @param {string} password - Le mot de passe en clair
+ * @param {string} hashedPassword - Le mot de passe hashé
+ * @returns {Promise<boolean>} - True si les mots de passe correspondent
+ */
 export async function comparePassword(password, hashedPassword) {
-  return await bcrypt.compare(password, hashedPassword);
+  try {
+    return await bcrypt.compare(password, hashedPassword);
+  } catch (error) {
+    throw new Error("Erreur lors de la vérification du mot de passe");
+  }
 }
 
-// Générer une chaîne aléatoire pour l'état Spotify
-export const generateState = () => {
-  return (
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15)
-  );
-};
+/**
+ * Valider le format d'un email
+ * @param {string} email - L'email à valider
+ * @returns {boolean} - True si l'email est valide
+ */
+export function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
 
-// URL d'autorisation Spotify
-export const getSpotifyAuthUrl = (state) => {
-  const scopes = [
-    "user-read-private",
-    "user-read-email",
-    "user-top-read",
-    "user-read-recently-played",
-    "playlist-read-private",
-    "playlist-modify-public",
-    "playlist-modify-private",
-  ].join(" ");
+/**
+ * Valider la force d'un mot de passe
+ * @param {string} password - Le mot de passe à valider
+ * @returns {object} - Objet contenant la validité et les erreurs
+ */
+export function validatePassword(password) {
+  const errors = [];
 
-  const params = new URLSearchParams({
-    response_type: "code",
-    client_id: process.env.SPOTIFY_CLIENT_ID,
-    scope: scopes,
-    redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
-    state: state,
-  });
+  if (!password) {
+    errors.push("Le mot de passe est requis");
+  } else {
+    if (password.length < 6) {
+      errors.push("Le mot de passe doit contenir au moins 6 caractères");
+    }
+    if (password.length > 100) {
+      errors.push("Le mot de passe ne peut pas dépasser 100 caractères");
+    }
+  }
 
-  return `https://accounts.spotify.com/authorize?${params.toString()}`;
-};
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}

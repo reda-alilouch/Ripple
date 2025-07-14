@@ -138,26 +138,13 @@ const ArtistDashboard = ({ artistData }) => {
       if (uploadForm.imageFile) {
         formData.append("imageFile", uploadForm.imageFile);
       }
-
-      console.log("Envoi des données:", {
-        title: uploadForm.title,
-        projectType: uploadForm.projectType,
-        hasAudio: !!uploadForm.audioFile,
-        hasImage: !!uploadForm.imageFile,
-      });
-
       // Envoyer à l'API
       const response = await fetch("/api/projects/upload", {
         method: "POST",
         body: formData,
       });
-
-      console.log("Réponse du serveur:", response.status, response.statusText);
-
       if (response.ok) {
         const result = await response.json();
-        console.log("Projet uploadé avec succès:", result);
-
         // Réinitialiser le formulaire
         setUploadForm({
           title: "",
@@ -205,7 +192,6 @@ const ArtistDashboard = ({ artistData }) => {
     try {
       const response = await fetch("/api/projects");
       const data = await response.json();
-      console.log("Projets récupérés:", data);
       if (data.success) {
         alert(`Nombre de projets en base: ${data.projects.length}`);
       } else {

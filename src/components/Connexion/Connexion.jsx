@@ -35,6 +35,7 @@ export default function Connexion() {
   const [userImage, setUserImage] = useState(null);
   useEffect(() => {
     const loadUserRole = async () => {
+      if (status !== "authenticated" || !session?.user) return;
       try {
         const response = await axios.get("/api/profile/image");
         if (response.data.ok) {
@@ -47,7 +48,7 @@ export default function Connexion() {
     };
 
     loadUserRole();
-  }, []);
+  }, [session, status]);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (showDropdown && !event.target.closest(".profile-dropdown")) {

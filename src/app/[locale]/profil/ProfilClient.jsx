@@ -20,12 +20,13 @@ const ProfilClient = ({ userData }) => {
   const bannerInputRef = useRef(null);
 
   // Ajout de la session NextAuth côté client
-  const { data: session, update } = useSession
+  const { data: session, status } = useSession
     ? useSession()
-    : { data: null, update: null };
+    : { data: null, status: "loading" };
 
-  // Charger le rôle de l'utilisateur
+  // Charger le rôle de l'utilisateur UNIQUEMENT quand la session est prête
   useEffect(() => {
+    if (status !== "authenticated" || !session?.user) return;
     const loadUserRole = async () => {
       try {
         const response = await axios.get("/api/user/role");
@@ -40,9 +41,8 @@ const ProfilClient = ({ userData }) => {
         console.error("Erreur lors du chargement du rôle:", error);
       }
     };
-
     loadUserRole();
-  }, []);
+  }, [session, status]);
 
   // Données fictives pour l'historique et les recommandations
   const historique = [
@@ -138,7 +138,6 @@ const ProfilClient = ({ userData }) => {
     try {
       const response = await axios.get("/api/user/role");
       const data = response.data;
-      console.log("Rôle utilisateur:", data);
       setNotification({
         message: `Rôle actuel: ${data.role || "Non défini"}`,
         type: "info",
@@ -152,40 +151,8 @@ const ProfilClient = ({ userData }) => {
     }
   };
 
-  // Fonction de diagnostic complète
-  const runDiagnostic = async () => {
-    try {
-      const response = await axios.get("/api/user/role/test");
-      const data = response.data;
-      console.log("Diagnostic complet:", data);
-
-      if (data.success) {
-        setNotification({
-          message: `Diagnostic: ${data.user.role} - ${data.message}`,
-          type: "success",
-        });
-        // Recharger le rôle si il a été initialisé
-        if (data.user.role) {
-          setUserRole(data.user.role);
-        }
-      } else {
-        setNotification({
-          message: `Erreur diagnostic: ${data.error}`,
-          type: "error",
-        });
-      }
-    } catch (error) {
-      console.error("Erreur lors du diagnostic:", error);
-      setNotification({
-        message: "Erreur lors du diagnostic",
-        type: "error",
-      });
-    }
-  };
-
   // Handler pour la photo de profil
   const handleProfileImageChange = async (e) => {
-    console.log("Profile input triggered");
     const file = e.target.files[0];
     if (!file) return;
 
@@ -317,6 +284,15 @@ const ProfilClient = ({ userData }) => {
       });
     }
   };
+
+  // Affichage conditionnel selon le rôle
+  if (!userRole || (userRole !== "artist" && userRole !== "listener")) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300 flex items-center justify-center">
+        <RoleSelector onRoleSelected={handleRoleSelected} onClose={() => {}} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
@@ -477,11 +453,6 @@ const ProfilClient = ({ userData }) => {
                         Modifier le profil
                       </button>
 
-                      {/* Debug: Afficher le rôle actuel */}
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        Rôle actuel: {userRole || "Non défini"}
-                      </div>
-
                       {/* Bouton Devenir Artiste - affiché si pas encore artiste */}
                       {(userRole === "listener" || !userRole) && (
                         <button
@@ -492,30 +463,6 @@ const ProfilClient = ({ userData }) => {
                           Devenir Artiste
                         </button>
                       )}
-
-                      {/* Bouton de test pour forcer l'affichage du sélecteur */}
-                      <button
-                        onClick={() => setShowRoleSelector(true)}
-                        className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full text-sm"
-                      >
-                        Test: Ouvrir Sélecteur
-                      </button>
-
-                      {/* Bouton de test pour vérifier le rôle */}
-                      <button
-                        onClick={testUserRole}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm"
-                      >
-                        Test: Vérifier Rôle
-                      </button>
-
-                      {/* Bouton de diagnostic complet */}
-                      <button
-                        onClick={runDiagnostic}
-                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full text-sm"
-                      >
-                        Diagnostic Complet
-                      </button>
 
                       <button className="bg-transparent border border-black/30 dark:border-white/30 hover:bg-black/10 dark:hover:bg-white/10 text-black dark:text-white px-6 py-2 rounded-full flex items-center gap-2 transition-all duration-300 hover:transform hover:translate-y-[-2px]">
                         <Icon lib="fa-solid" name="fa-share" />

@@ -33,19 +33,17 @@ if (!i18n.isInitialized) {
         interpolation: {
           escapeValue: false, // React gère déjà l'échappement
         },
-        debug: true,
+        debug: process.env.NODE_ENV === "development",
+        ignoreJSONStructure: true,
       },
       (err, t) => {
         if (err) {
           console.error("Erreur d'initialisation i18next:", err);
-        } else {
-          console.log("i18next initialisé avec la langue:", i18n.language);
         }
       }
     );
 
   i18n.on("languageChanged", (lng) => {
-    console.log("Langue changée:", lng);
   });
 }
 

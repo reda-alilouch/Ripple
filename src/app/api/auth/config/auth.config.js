@@ -17,8 +17,8 @@ export const authConfig = {
     },
     async redirect({ url, baseUrl }) {
       if (url.startsWith(baseUrl)) return url;
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      return `${baseUrl}/profil`;
+      if (url.startsWith("/")) return `${url}`;
+      return `/`;
     },
     async session({ session, token }) {
       if (token?.sub) {

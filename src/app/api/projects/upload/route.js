@@ -16,16 +16,6 @@ export async function POST(request) {
     const collaborators = formData.get("collaborators");
     const audioFile = formData.get("audioFile");
     const imageFile = formData.get("imageFile");
-
-    console.log("Données reçues:", {
-      title,
-      description,
-      projectType,
-      collaborators,
-      audioFile: audioFile ? audioFile.name : "Aucun fichier audio",
-      imageFile: imageFile ? imageFile.name : "Aucune image",
-    });
-
     // Validation des données requises
     if (!title || !projectType || !audioFile) {
       return NextResponse.json(
@@ -89,13 +79,11 @@ export async function POST(request) {
     if (audioFile) {
       // Simuler l'upload audio
       audioUrl = `/uploads/audio/${Date.now()}_${audioFile.name}`;
-      console.log("URL audio simulée:", audioUrl);
     }
 
     if (imageFile) {
       // Simuler l'upload image
       imageUrl = `/uploads/images/${Date.now()}_${imageFile.name}`;
-      console.log("URL image simulée:", imageUrl);
     }
 
     // Créer et sauvegarder le projet dans la base de données
@@ -113,10 +101,7 @@ export async function POST(request) {
       status: "pending",
     });
 
-    console.log("Sauvegarde du projet en base de données...");
     const savedProject = await project.save();
-    console.log("Projet sauvegardé avec succès:", savedProject._id);
-
     return NextResponse.json({
       success: true,
       message: "Projet uploadé avec succès",

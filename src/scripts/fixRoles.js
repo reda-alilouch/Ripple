@@ -13,7 +13,7 @@ async function fixGoogleProviders() {
     { provider: "credentials", password: { $exists: false } },
     { $set: { provider: "google" } }
   );
-  console.log(`Comptes Google corrigés : ${res.modifiedCount}`);
+
   await mongoose.disconnect();
 }
 

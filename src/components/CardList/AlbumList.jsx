@@ -17,7 +17,6 @@ export default function ListAlbum() {
 
         const response = await axios.get("/api/albums");
         const data = response.data;
-        console.log("Données albums reçues:", data);
 
         if (data.albums && Array.isArray(data.albums)) {
           setAlbums(data.albums);

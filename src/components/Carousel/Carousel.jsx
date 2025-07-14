@@ -11,7 +11,6 @@ function Carousel() {
   const { i18n } = useTranslation();
   const locale = i18n.language; // 'fr' ou 'en'
   const splideRef = useRef(null);
-  console.log("locale utilisée pour la bannière :", locale);
 
   useEffect(() => {
     fetch("/api/banner")
@@ -44,7 +43,6 @@ function Carousel() {
       <div className="splide__track">
         <ul className="splide__list">
           {banners.map((item) => {
-            console.log("item banner:", item);
             return (
               <li
                 key={item._id}

@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { authConfig } from "@/app/api/auth/config/auth.config";
 
 export async function POST(request) {
-  console.log("API /api/user/role POST appelée");
+
   try {
     const session = await getServerSession(authConfig);
 
@@ -40,10 +40,6 @@ export async function POST(request) {
     if (!user.role) {
       user.role = "listener";
       await user.save();
-      console.log(
-        "Champ role initialisé à 'listener' pour l'utilisateur:",
-        user.email
-      );
     }
 
     // Vérifier si l'utilisateur a déjà un rôle défini (autre que listener)
@@ -114,7 +110,6 @@ export async function POST(request) {
 }
 
 export async function GET(request) {
-  console.log("API /api/user/role GET appelée");
   try {
     const session = await getServerSession(authConfig);
 
@@ -130,13 +125,13 @@ export async function GET(request) {
     const user = await User.findById(session.user.id);
     if (!user) {
       return NextResponse.json(
-        { success: false, error: "Utilisateur non trouvé" },
+        { ok: false, error: "Utilisateur non trouvé" },
         { status: 404 }
       );
     }
 
     return NextResponse.json({
-      success: true,
+      ok: true,
       role: user.role,
       hasProfile: user.role !== "listener",
     });
