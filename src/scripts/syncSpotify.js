@@ -7,21 +7,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, "../../.env.local") });
 
-// Vérifier que les variables d'environnement sont chargées
-console.log("Variables d'environnement chargées:");
-console.log(
-  "MONGODB_URI:",
-  process.env.MONGODB_URI ? "✓ Configuré" : "✗ Manquant"
-);
-console.log(
-  "SPOTIFY_CLIENT_ID:",
-  process.env.SPOTIFY_CLIENT_ID ? "✓ Configuré" : "✗ Manquant"
-);
-console.log(
-  "SPOTIFY_CLIENT_SECRET:",
-  process.env.SPOTIFY_CLIENT_SECRET ? "✓ Configuré" : "✗ Manquant"
-);
-
 import { connectMongoDB } from "../lib/mongodb.js";
 import Titre from "../models/Titre.js";
 import Artiste from "../models/Artiste.js";
@@ -34,53 +19,117 @@ import {
   getSpotifyPlaylists,
 } from "../lib/spotify.js";
 
+// MODIFIE ICI pour ta playlist et ton market
+const playlistId = "37i9dQZF1DXcBWIGoYBM5M"; // ID d'une playlist publique confirmée
+const market = "FR"; // Région France
+
 async function syncAll() {
   try {
     await connectMongoDB();
 
-    // Titres
-    const tracks = await getSpotifyTracks();
+    const tracks = await getSpotifyTracks(playlistId, market);
     for (const track of tracks) {
+      const t = track.track;
+      if (!t) continue;
+      const trackData = {
+        spotifyId: t.id,
+        uri: t.uri,
+        preview_url: t.preview_url || null,
+        image: t.album?.images?.[0]?.url || "",
+        artists: t.artists?.map((a) => a.name) || [],
+        album: {
+          id: t.album?.id || null,
+          name: t.album?.name || "",
+          images: t.album?.images || [],
+        },
+        duration_ms: t.duration_ms || 0,
+        explicit: t.explicit || false,
+        popularity: t.popularity || 0,
+        name: t.name || "Unknown Track",
+      };
       await Titre.updateOne(
-        { spotifyId: track.spotifyId },
-        { $set: track },
+        { spotifyId: t.id },
+        { $set: trackData },
         { upsert: true }
       );
     }
 
-    // Artistes
-    const artists = await getSpotifyArtists();
+    // Récupère tous les IDs d'artistes uniques des tracks
+    const artistIds = [
+      ...new Set(
+        tracks
+          .map((track) => track.track?.artists?.map((a) => a.id))
+          .flat()
+          .filter(Boolean)
+      ),
+    ];
+    const artists = await getSpotifyArtists(artistIds, market);
     for (const artist of artists) {
+      if (!artist) continue;
+      const artistData = {
+        spotifyId: artist.id,
+        name: artist.name,
+        genres: artist.genres,
+        image: artist.images?.[0]?.url || "",
+        followers: artist.followers?.total || 0,
+        popularity: artist.popularity || 0,
+        uri: artist.uri,
+      };
       await Artiste.updateOne(
-        { spotifyId: artist.spotifyId },
-        { $set: artist },
+        { spotifyId: artist.id },
+        { $set: artistData },
         { upsert: true }
       );
     }
-
-    // Albums
-    const albums = await getSpotifyAlbums();
+    // Récupère tous les IDs d'albums uniques des tracks
+    const albumIds = [
+      ...new Set(tracks.map((track) => track.track?.album?.id).filter(Boolean)),
+    ];
+    const albums = await getSpotifyAlbums(albumIds, market);
     for (const album of albums) {
-      album.image = (album.images && album.images[0]?.url) || "";
+      if (!album) continue;
+      const albumData = {
+        spotifyId: album.id,
+        name: album.name,
+        artists: album.artists?.map((a) => a.name) || [],
+        release_date: album.release_date,
+        image: album.images?.[0]?.url || "",
+        total_tracks: album.total_tracks,
+        album_type: album.album_type,
+        uri: album.uri,
+      };
       await Album.updateOne(
-        { spotifyId: album.spotifyId },
-        { $set: album },
+        { spotifyId: album.id },
+        { $set: albumData },
         { upsert: true }
       );
     }
 
-    // Playlists
-    const playlists = await getSpotifyPlaylists();
+    const playlists = await getSpotifyPlaylists([playlistId], market);
     for (const playlist of playlists) {
-      playlist.image =
-        (playlist.images && playlist.images[0]?.url) || playlist.image || "";
+      if (!playlist) continue;
+      const playlistData = {
+        spotifyId: playlist.id,
+        name: playlist.name,
+        description: playlist.description || "",
+        owner: playlist.owner?.display_name || "",
+        tracks:
+          playlist.tracks?.items
+            ?.map((item) => item.track?.id)
+            .filter(Boolean) || [],
+        image: playlist.images?.[0]?.url || "",
+        public: playlist.public,
+        collaborative: playlist.collaborative,
+        uri: playlist.uri,
+      };
       await Playlist.updateOne(
-        { spotifyId: playlist.spotifyId },
-        { $set: playlist },
+        { spotifyId: playlist.id },
+        { $set: playlistData },
         { upsert: true }
       );
     }
   } catch (error) {
+    console.error("❌ Sync failed:", error.response?.data || error.message);
     process.exit(1);
   }
 }

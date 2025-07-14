@@ -96,7 +96,7 @@ const SearchBar = () => {
     window.dispatchEvent(searchEvent);
   }, [searchParams, router, searchValue]);
   return (
-    <div className="relative m-auto w-full h-10 xl:w-4/12">
+    <div className="relative m-auto w-full h-10 xl:w-4/12" id="searchbar">
       <div>
         <input
           ref={inputRef}

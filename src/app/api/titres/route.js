@@ -11,9 +11,6 @@ export async function GET() {
       .limit(9)
       .sort({ createdAt: -1 }) // Trier par date de création décroissante
       .lean(); // Pour de meilleures performances
-
-    console.log("Titres récupérés de MongoDB:", titres);
-
     // Transformer les données pour correspondre au format attendu par le composant
     const formattedTitres = titres.map((titre) => {
       // Vérifier et nettoyer l'URL de l'image
@@ -50,8 +47,6 @@ export async function GET() {
         duration_ms: titre.duration,
       };
     });
-
-    console.log("Titres formatés:", formattedTitres);
 
     return NextResponse.json({
       tracks: formattedTitres,

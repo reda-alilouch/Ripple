@@ -11,9 +11,6 @@ export async function GET() {
       .limit(6)
       .sort({ createdAt: -1 })
       .lean();
-
-    console.log("Playlists récupérées de MongoDB:", playlists);
-
     // Transformer les données pour correspondre au format attendu
     const formattedPlaylists = playlists.map((playlist) => {
       // Vérifier et nettoyer l'URL de l'image
@@ -52,9 +49,6 @@ export async function GET() {
         spotifyId: playlist.spotifyId,
       };
     });
-
-    console.log("Playlists formatées:", formattedPlaylists);
-
     return NextResponse.json({
       playlists: formattedPlaylists,
       success: true,

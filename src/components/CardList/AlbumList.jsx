@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Album from "@/components/Card/Album/Album";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
 
 export default function ListAlbum() {
   const [albums, setAlbums] = useState([]);
@@ -14,13 +15,8 @@ export default function ListAlbum() {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch("/api/albums");
-        if (!response.ok) {
-          throw new Error("Erreur lors de la récupération des albums");
-        }
-
-        const data = await response.json();
-        console.log("Données albums reçues:", data);
+        const response = await axios.get("/api/albums");
+        const data = response.data;
 
         if (data.albums && Array.isArray(data.albums)) {
           setAlbums(data.albums);

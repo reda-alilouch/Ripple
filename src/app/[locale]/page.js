@@ -15,7 +15,7 @@ export default function Home() {
       <ListTrack />
       <ListAlbum />
       <ListArtiste />
-      <PlaylistList />
+      <PlaylistList playlist={PlaylistList} />
     </div>
   );
 }

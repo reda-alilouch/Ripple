@@ -9,7 +9,6 @@ export default function ForceI18nLanguageFromUrl() {
     const locale = pathname.split("/")[1];
     if (locale && i18n.language !== locale) {
       i18n.changeLanguage(locale);
-      console.log("ForceI18nLanguageFromUrl: langue forcée à", locale);
     }
   }, [pathname]);
   return null;

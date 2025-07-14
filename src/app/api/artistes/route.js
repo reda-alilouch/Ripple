@@ -18,9 +18,6 @@ export async function GET(req) {
       .limit(limit)
       .sort({ createdAt: -1 })
       .lean();
-
-    console.log("Artistes récupérés de MongoDB:", artistes);
-
     // Transformer les données pour correspondre au format attendu
     const formattedArtistes = artistes.map((artiste) => {
       // Vérifier et nettoyer l'URL de l'image
@@ -46,8 +43,6 @@ export async function GET(req) {
         spotifyId: artiste.spotifyId,
       };
     });
-
-    console.log("Artistes formatés:", formattedArtistes);
 
     return NextResponse.json({
       artists: formattedArtistes,

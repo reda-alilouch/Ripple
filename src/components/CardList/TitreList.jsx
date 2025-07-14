@@ -90,7 +90,9 @@ export default function ListTrack() {
         <div className="head pt-5 px-5">
           <h2 className="top font-bold">{t("topTracks")}</h2>
         </div>
-        <div className="px-5">Chargement des titres en cours...</div>
+        <div className="flex justify-center mt-5">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
+        </div>
       </section>
     );
   }

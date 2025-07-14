@@ -1,25 +1,31 @@
 import { NextResponse } from "next/server";
-import connectMongoDB from "@/lib/mongodb";
+import { connectMongoDB } from "@/lib/mongodb";
 import { hashPassword } from "@/lib/auth";
 import User from "@/models/users";
 
 export async function POST(request) {
   try {
-    console.log("Début de la requête d'inscription");
     const { email, password, name } = await request.json();
-    console.log("Données reçues:", { email, name });
 
     // Validation des données
     if (!email || !password || !name) {
-      console.log("Champs manquants");
       return NextResponse.json(
         { success: false, error: "Tous les champs sont requis" },
         { status: 400 }
       );
     }
 
+    // Validation email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { success: false, error: "Format d'email invalide" },
+        { status: 400 }
+      );
+    }
+
+    // Validation mot de passe
     if (password.length < 6) {
-      console.log("Mot de passe trop court");
       return NextResponse.json(
         {
           success: false,
@@ -29,46 +35,51 @@ export async function POST(request) {
       );
     }
 
-    console.log("Connexion à MongoDB...");
     await connectMongoDB();
-    console.log("Connecté à MongoDB");
 
     // Vérifier si l'utilisateur existe déjà
-    console.log("Vérification de l'existence de l'utilisateur...");
     const existingUser = await User.findOne({
       email: email.toLowerCase().trim(),
     });
 
     if (existingUser) {
-      console.log("Utilisateur existe déjà");
       return NextResponse.json(
         { success: false, error: "Un utilisateur avec cet email existe déjà" },
         { status: 409 }
       );
     }
 
-    console.log("Hachage du mot de passe...");
+    // Hasher le mot de passe
     const hashedPassword = await hashPassword(password);
 
-    console.log("Création de l'utilisateur...");
+    // Créer l'utilisateur
     const user = new User({
-      name,
+      name: name.trim(),
       email: email.toLowerCase().trim(),
       password: hashedPassword,
       provider: "credentials",
       emailVerified: new Date(),
+      createdAt: new Date(),
     });
 
-    console.log("Sauvegarde de l'utilisateur...");
     await user.save();
-    console.log("Utilisateur créé avec succès");
 
+    // Réponse sans le mot de passe
     return NextResponse.json(
-      { success: true, message: "Compte créé avec succès" },
+      {
+        success: true,
+        message: "Compte créé avec succès",
+        user: { 
+          id: user._id.toString(), 
+          name: user.name, 
+          email: user.email,
+          provider: user.provider 
+        },
+      },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Erreur lors de l'inscription:", error);
+    console.error("Erreur signup:", error);
     return NextResponse.json(
       {
         success: false,
@@ -77,4 +88,11 @@ export async function POST(request) {
       { status: 500 }
     );
   }
+}
+
+export async function GET() {
+  return NextResponse.json(
+    { success: false, error: "Méthode non autorisée" },
+    { status: 405 }
+  );
 }

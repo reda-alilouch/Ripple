@@ -100,7 +100,7 @@ export const getUserPlaylists = async (accessToken, limit = 50) => {
   }
 };
 
-// Obtenir un token d'accès client
+// Récupère un access token Spotify (client credentials)
 export const getAccessToken = async () => {
   try {
     const response = await axios.post(
@@ -116,130 +116,76 @@ export const getAccessToken = async () => {
         },
       }
     );
-
     return response.data.access_token;
   } catch (error) {
     throw error;
   }
 };
 
-// Récupérer des titres populaires (exemple: top tracks d'un artiste connu)
-export const getSpotifyTracks = async () => {
+// Récupère tous les tracks d'une playlist Spotify
+export const getSpotifyTracks = async (playlistId, market = "FR") => {
   const accessToken = await getAccessToken();
-  // ID de la playlist "Top 50 Global"
-  const playlistId = "37i9dQZEVXbMDoHDwVN2tF";
-  const response = await axios.get(
-    `https://api.spotify.com/v1/playlists/${playlistId}/tracks?market=US&limit=100`,
-    {
+  let url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks?market=${market}&limit=100`;
+  let tracks = [];
+  let next = url;
+
+  while (next) {
+    try {
+      const res = await axios.get(next, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      tracks = tracks.concat(res.data.items);
+      next = res.data.next;
+    } catch (error) {
+      console.error("Spotify API error:", error.response?.data || error);
+      throw error;
+    }
+  }
+  return tracks;
+};
+
+// Récupère tous les artistes d'une liste d'IDs
+export const getSpotifyArtists = async (artistIds = [], market = "US") => {
+  const accessToken = await getAccessToken();
+  let artists = [];
+  // Spotify API: max 50 IDs per request
+  for (let i = 0; i < artistIds.length; i += 50) {
+    const ids = artistIds.slice(i, i + 50).join(",");
+    const url = `https://api.spotify.com/v1/artists?ids=${ids}`;
+    const res = await axios.get(url, {
       headers: { Authorization: `Bearer ${accessToken}` },
-    }
-  );
-  return response.data.items
-    .map((item) => item.track)
-    .filter((track) => !!track && !!track.preview_url)
-    .map((track) => ({
-      spotifyId: track.id,
-      name: track.name,
-      artists: track.artists.map((a) => a.name),
-      album: track.album.name,
-      image: track.album.images[0]?.url || "",
-      duration: track.duration_ms,
-      previewUrl: track.preview_url,
-    }));
+    });
+    artists = artists.concat(res.data.artists);
+  }
+  return artists;
 };
 
-// Récupérer des artistes populaires avec pagination
-export const getSpotifyArtists = async () => {
+// Récupère tous les albums d'une liste d'IDs
+export const getSpotifyAlbums = async (albumIds = [], market = "US") => {
   const accessToken = await getAccessToken();
-  let allArtists = [];
-  let limit = 50;
-
-  // Récupérer 100 artistes (2 pages de 50)
-  for (let offset = 0; offset < 100; offset += limit) {
-    const response = await axios.get(
-      `https://api.spotify.com/v1/search?q=pop&type=artist&limit=${limit}&offset=${offset}`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-    allArtists = allArtists.concat(response.data.artists.items);
-
-    // Stop si moins de 50 résultats (fin de la pagination)
-    if (response.data.artists.items.length < limit) break;
+  let albums = [];
+  // Spotify API: max 20 IDs per request
+  for (let i = 0; i < albumIds.length; i += 20) {
+    const ids = albumIds.slice(i, i + 20).join(",");
+    const url = `https://api.spotify.com/v1/albums?ids=${ids}&market=${market}`;
+    const res = await axios.get(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    albums = albums.concat(res.data.albums);
   }
-
-  return allArtists.map((artist) => ({
-    spotifyId: artist.id,
-    name: artist.name,
-    genres: artist.genres,
-    image: artist.images[0]?.url || "",
-  }));
+  return albums;
 };
 
-// Récupérer des albums populaires avec pagination
-export const getSpotifyAlbums = async () => {
+// Récupère les infos d'une playlist
+export const getSpotifyPlaylists = async (playlistIds = [], market = "US") => {
   const accessToken = await getAccessToken();
-  let allAlbums = [];
-  let limit = 50;
-
-  // Récupérer 100 albums (2 pages de 50)
-  for (let offset = 0; offset < 100; offset += limit) {
-    const response = await axios.get(
-      `https://api.spotify.com/v1/artists/3TVXtAsR1Inumwj472S9r4/albums?market=FR&limit=${limit}&offset=${offset}`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-    allAlbums = allAlbums.concat(response.data.items);
-
-    // Stop si moins de 50 résultats (fin de la pagination)
-    if (response.data.items.length < limit) break;
+  let playlists = [];
+  for (const playlistId of playlistIds) {
+    const url = `https://api.spotify.com/v1/playlists/${playlistId}?market=${market}`;
+    const res = await axios.get(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    playlists.push(res.data);
   }
-
-  return allAlbums.map((album) => ({
-    spotifyId: album.id,
-    name: album.name,
-    artists: album.artists.map((a) => a.name),
-    release_date: album.release_date,
-    image: album.images[0]?.url || "",
-  }));
-};
-
-// Récupérer des playlists populaires avec pagination
-export const getSpotifyPlaylists = async () => {
-  const accessToken = await getAccessToken();
-  let allPlaylists = [];
-  let limit = 50;
-
-  for (let offset = 0; offset < 100; offset += limit) {
-    const response = await axios.get(
-      `https://api.spotify.com/v1/search?q=top%20playlist&type=playlist&limit=${limit}&offset=${offset}&market=FR`,
-      {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      }
-    );
-
-    // Sécurité : vérifier la présence de playlists
-    if (
-      response.data &&
-      response.data.playlists &&
-      Array.isArray(response.data.playlists.items)
-    ) {
-      allPlaylists = allPlaylists.concat(response.data.playlists.items);
-
-      // Stop si moins de 50 résultats (fin de la pagination)
-      if (response.data.playlists.items.length < limit) break;
-    }
-  }
-
-  return allPlaylists
-    .filter((playlist) => playlist !== null && playlist !== undefined)
-    .map((playlist) => ({
-      spotifyId: playlist.id,
-      name: playlist.name,
-      description: playlist.description || "",
-      owner: playlist.owner?.display_name || "",
-      tracks: [], // Tableau vide pour éviter les erreurs de type
-      image: playlist.images?.[0]?.url || "",
-    }));
+  return playlists;
 };

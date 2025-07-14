@@ -1,4 +1,4 @@
-
+import axios from "axios";
 
 export async function GET(req) {
   const access_token = req.headers.get("Authorization")?.split(" ")[1];
@@ -11,17 +11,15 @@ export async function GET(req) {
     Authorization: `Bearer ${access_token}`,
   };
 
-  const [topArtists, topTracks, playlists] = await Promise.all([
-    fetch("https://api.spotify.com/v1/me/top/artists", { headers }),
-    fetch("https://api.spotify.com/v1/me/top/tracks", { headers }),
-    fetch("https://api.spotify.com/v1/me/playlists", { headers }),
+  const [artistsRes, tracksRes, playlistsRes] = await Promise.all([
+    axios.get("https://api.spotify.com/v1/me/top/artists", { headers }),
+    axios.get("https://api.spotify.com/v1/me/top/tracks", { headers }),
+    axios.get("https://api.spotify.com/v1/me/playlists", { headers }),
   ]);
 
-  const [artistsData, tracksData, playlistsData] = await Promise.all([
-    topArtists.json(),
-    topTracks.json(),
-    playlists.json(),
-  ]);
+  const artistsData = artistsRes.data;
+  const tracksData = tracksRes.data;
+  const playlistsData = playlistsRes.data;
 
   return Response.json({
     artists: artistsData.items,

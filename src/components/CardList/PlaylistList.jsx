@@ -32,6 +32,40 @@ const PlaylistList = () => {
       }
     };
 
+    const playPlaylist = async (uri) => {
+      const token = localStorage.getItem('spotify_access_token');
+      const deviceId = localStorage.getItem('spotify_device_id'); // Tu dois le stocker lors de l'init du player
+    
+      if (!token || !deviceId) {
+        alert("Spotify player non prêt.");
+        return;
+      }
+    
+      try {
+        const response = await fetch(
+          `https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              context_uri: uri, // Spotify playlist URI
+            }),
+          }
+        );
+    
+        if (!response.ok) {
+          throw new Error("Erreur de lecture de la playlist");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Impossible de lire la playlist");
+      }
+    };
+    
+
     fetchPlaylists();
   }, []);
 
