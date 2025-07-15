@@ -59,11 +59,6 @@ const handler = NextAuth({
       },
     }),
   ],
-  pages: {
-    signIn: "/",
-    error: "/",
-    newUser: "/",
-  },
   callbacks: {
     async signIn({ user, account, profile }) {
       try {

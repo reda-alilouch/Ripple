@@ -1,3 +1,4 @@
+// src/app/api/auth/signin/route.js
 import { NextResponse } from "next/server";
 import { connectMongoDB } from "@/lib/mongodb";
 import User from "@/models/users";
