@@ -38,9 +38,6 @@ export default function ListTrack() {
           .filter((track) => {
             // Vérifier que la piste a un ID et un nom
             const isValid = track && track.id && track.name;
-            if (!isValid) {
-              console.warn("Piste invalide ignorée:", track);
-            }
             return isValid;
           })
           .map((track) => {
@@ -58,11 +55,6 @@ export default function ListTrack() {
                 duration_ms: track.duration_ms || 0,
               };
             } catch (error) {
-              console.error(
-                "Erreur lors du traitement d'une piste:",
-                error,
-                track
-              );
               return null; // Retourner null pour les pistes en erreur
             }
           })
@@ -70,7 +62,6 @@ export default function ListTrack() {
 
         setTracks(titres);
       } catch (err) {
-        console.error("Erreur lors de la récupération des titres:", err);
         const errorMessage =
           err.response?.data?.error ||
           err.message ||

@@ -7,8 +7,6 @@ import { MongoClient } from "mongodb";
 // Charger les variables d'environnement
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-console.log("MONGODB_URI:", process.env.MONGODB_URI);
-console.log(">>> mongodb.js loaded");
 
 if (!process.env.MONGODB_URI) {
   throw new Error(
