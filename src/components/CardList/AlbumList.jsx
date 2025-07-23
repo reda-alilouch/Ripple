@@ -21,11 +21,11 @@ export default function ListAlbum() {
         if (data.albums && Array.isArray(data.albums)) {
           setAlbums(data.albums);
         } else {
-          console.warn("Format de données inattendu pour les albums:", data);
+          // console.warn("Format de données inattendu pour les albums:", data);
           setAlbums([]);
         }
       } catch (err) {
-        console.error("Erreur chargement albums:", err);
+        // console.error("Erreur chargement albums:", err);
         setError(err.message);
       } finally {
         setIsLoading(false);

@@ -25,11 +25,11 @@ export default function ListArtiste() {
         if (data.artists && Array.isArray(data.artists)) {
           setArtists(data.artists);
         } else {
-          console.warn("Format de données inattendu pour les artistes:", data);
+          // console.warn("Format de données inattendu pour les artistes:", data);
           setArtists([]);
         }
       } catch (err) {
-        console.error("❌ Erreur fetch artistes:", err);
+        // console.error("❌ Erreur fetch artistes:", err);
         setError(err.message);
       } finally {
         setIsLoading(false);

@@ -118,7 +118,7 @@ export default function SearchPage() {
   useEffect(() => {
     const search = async () => {
       if (!searchTerm) {
-        console.log("Aucun terme de recherche, réinitialisation des résultats");
+        // console.log("Aucun terme de recherche, réinitialisation des résultats");
         setSearchResults({
           tracks: [],
           artists: [],
@@ -128,7 +128,7 @@ export default function SearchPage() {
         return;
       }
 
-      console.log("Lancement de la recherche pour:", searchTerm);
+      // console.log("Lancement de la recherche pour:", searchTerm);
       setIsLoading(true);
       setError(null);
 
@@ -136,16 +136,16 @@ export default function SearchPage() {
         const apiUrl = `/api/spotify/search?q=${encodeURIComponent(
           searchTerm
         )}`;
-        console.log("URL de l'API:", apiUrl);
+        // console.log("URL de l'API:", apiUrl);
 
         const response = await fetch(apiUrl);
         const responseData = await response.json();
 
-        console.log("Réponse de l'API:", {
-          status: response.status,
-          ok: response.ok,
-          data: responseData,
-        });
+        // console.log("Réponse de l'API:", {
+        //   status: response.status,
+        //   ok: response.ok,
+        //   data: responseData,
+        // });
 
         if (!response.ok) {
           const errorMessage =
@@ -159,12 +159,12 @@ export default function SearchPage() {
           throw new Error("Aucune donnée reçue de l'API");
         }
 
-        console.log("Résultats de la recherche:", {
-          tracks: responseData.tracks?.length || 0,
-          artists: responseData.artists?.length || 0,
-          albums: responseData.albums?.length || 0,
-          playlists: responseData.playlists?.length || 0,
-        });
+        // console.log("Résultats de la recherche:", {
+        //   tracks: responseData.tracks?.length || 0,
+        //   artists: responseData.artists?.length || 0,
+        //   albums: responseData.albums?.length || 0,
+        //   playlists: responseData.playlists?.length || 0,
+        // });
 
         setSearchResults(responseData);
       } catch (err) {

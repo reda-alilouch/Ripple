@@ -9,8 +9,6 @@ export async function GET() {
     // Récupérer les 4 premiers albums depuis MongoDB
     const albums = await Album.find({}).limit(4).sort({ createdAt: -1 }).lean();
 
-    console.log("Albums récupérés de MongoDB:", albums);
-
     // Transformer les données pour correspondre au format attendu
     const formattedAlbums = albums.map((album) => {
       // Vérifier et nettoyer l'URL de l'image
@@ -48,8 +46,6 @@ export async function GET() {
         spotifyId: album.spotifyId,
       };
     });
-
-    console.log("Albums formatés:", formattedAlbums);
 
     return NextResponse.json({
       albums: formattedAlbums,
