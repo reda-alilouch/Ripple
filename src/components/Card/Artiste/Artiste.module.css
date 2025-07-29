@@ -21,7 +21,7 @@
   .artistes {
     width: 160px !important;
     height: 180px !important;
-    img {
+    .img-artistes {
       width: 160px !important;
       height: 160px;
     }

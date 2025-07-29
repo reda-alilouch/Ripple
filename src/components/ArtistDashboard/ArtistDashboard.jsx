@@ -283,7 +283,7 @@ const ArtistDashboard = ({ artistData }) => {
   return (
     <div className="min-h-screen bg-white dark:bg-[#18181b] transition-colors duration-300">
       {/* Banner avec fonctionnalité d'upload */}
-      <div className="relative w-full mx-4 mt-6 rounded-2xl overflow-hidden shadow-lg">
+      <div className="relative w-full mx-4 mt-6 overflow-hidden shadow-lg rounded-2xl">
         {/* Image de banner */}
         <div className="relative h-48 md:h-64 lg:h-80">
           <Image
@@ -298,20 +298,20 @@ const ArtistDashboard = ({ artistData }) => {
           {/* Bouton d'édition du banner */}
           <button
             onClick={() => openFileSelector("banner")}
-            className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white p-2 rounded-full hover:bg-black/70 transition-all duration-300 group"
+            className="absolute p-2 text-white transition-all duration-300 rounded-full top-4 right-4 bg-black/50 backdrop-blur-sm hover:bg-black/70 group"
             title="Changer la photo de banner"
           >
             <Icon
               lib="fa-solid"
               name="fa-camera"
-              className="text-lg group-hover:scale-110 transition-transform"
+              className="text-lg transition-transform group-hover:scale-110"
             />
           </button>
         </div>
 
         {/* Contenu du banner */}
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-          <div className="flex flex-col md:flex-row items-end md:items-center justify-between gap-4">
+          <div className="flex flex-col items-end justify-between gap-4 md:flex-row md:items-center">
             {/* Profil avec photo */}
             <div className="flex items-center gap-4">
               <div className="relative">
@@ -324,7 +324,7 @@ const ArtistDashboard = ({ artistData }) => {
                     className="object-cover w-full h-full"
                   />
                   {artistData?.verified && (
-                    <div className="absolute bottom-1 right-1 bg-green-500 text-white rounded-full p-1 text-xs">
+                    <div className="absolute p-1 text-xs text-white bg-green-500 rounded-full bottom-1 right-1">
                       <Icon lib="fa-solid" name="fa-check" />
                     </div>
                   )}
@@ -338,23 +338,23 @@ const ArtistDashboard = ({ artistData }) => {
                   <Icon
                     lib="fa-solid"
                     name="fa-camera"
-                    className="text-sm group-hover:scale-110 transition-transform"
+                    className="text-sm transition-transform group-hover:scale-110"
                   />
                 </button>
               </div>
 
               <div className="text-white">
-                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-1">
+                <h2 className="mb-1 text-xl font-bold md:text-2xl lg:text-3xl">
                   {artistData?.stageName || "Nom de scène"}
                 </h2>
-                <p className="text-white/80 text-sm md:text-base">
+                <p className="text-sm text-white/80 md:text-base">
                   {artistData?.bio || "Biographie de l'artiste"}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {artistData?.genres?.map((genre, index) => (
                     <span
                       key={index}
-                      className="bg-white/20 backdrop-blur-sm text-white px-2 md:px-3 py-1 rounded-full text-xs font-medium"
+                      className="px-2 py-1 text-xs font-medium text-white rounded-full bg-white/20 backdrop-blur-sm md:px-3"
                     >
                       {genre}
                     </span>
@@ -364,7 +364,7 @@ const ArtistDashboard = ({ artistData }) => {
             </div>
 
             {/* Actions rapides */}
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <button
                 onClick={() => setShowUploadModal(true)}
                 className="bg-[#ff4545] text-white px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold hover:scale-105 transition-all duration-300 flex items-center gap-2 text-sm md:text-base"
@@ -375,7 +375,7 @@ const ArtistDashboard = ({ artistData }) => {
               {/* Bouton de test temporaire */}
               <button
                 onClick={testGetProjects}
-                className="bg-blue-500 text-white px-4 md:px-6 py-2 md:py-3 rounded-full font-semibold hover:scale-105 transition-all duration-300 flex items-center gap-2 text-sm md:text-base"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 bg-blue-500 rounded-full md:px-6 md:py-3 hover:scale-105 md:text-base"
               >
                 <Icon lib="fa-solid" name="fa-database" />
                 Test DB
@@ -399,10 +399,10 @@ const ArtistDashboard = ({ artistData }) => {
           <div className="text-2xl md:text-3xl text-[#ff4545] dark:text-white mb-2">
             <Icon lib="fa-solid" name="fa-users" />
           </div>
-          <div className="text-xl md:text-2xl font-bold text-black dark:text-white">
+          <div className="text-xl font-bold text-black md:text-2xl dark:text-white">
             {formatNumber(stats.monthlyListeners)}
           </div>
-          <div className="text-gray-500 dark:text-gray-300 text-xs md:text-sm text-center">
+          <div className="text-xs text-center text-gray-500 dark:text-gray-300 md:text-sm">
             Auditeurs mensuels
           </div>
         </div>
@@ -410,10 +410,10 @@ const ArtistDashboard = ({ artistData }) => {
           <div className="text-2xl md:text-3xl text-[#ff4545] dark:text-white mb-2">
             <Icon lib="fa-solid" name="fa-play" />
           </div>
-          <div className="text-xl md:text-2xl font-bold text-black dark:text-white">
+          <div className="text-xl font-bold text-black md:text-2xl dark:text-white">
             {formatNumber(stats.totalStreams)}
           </div>
-          <div className="text-gray-500 dark:text-gray-300 text-xs md:text-sm text-center">
+          <div className="text-xs text-center text-gray-500 dark:text-gray-300 md:text-sm">
             Écoutes totales
           </div>
         </div>
@@ -421,10 +421,10 @@ const ArtistDashboard = ({ artistData }) => {
           <div className="text-2xl md:text-3xl text-[#ff4545] dark:text-white mb-2">
             <Icon lib="fa-solid" name="fa-heart" />
           </div>
-          <div className="text-xl md:text-2xl font-bold text-black dark:text-white">
+          <div className="text-xl font-bold text-black md:text-2xl dark:text-white">
             {formatNumber(stats.followers)}
           </div>
-          <div className="text-gray-500 dark:text-gray-300 text-xs md:text-sm text-center">
+          <div className="text-xs text-center text-gray-500 dark:text-gray-300 md:text-sm">
             Abonnés
           </div>
         </div>
@@ -432,17 +432,17 @@ const ArtistDashboard = ({ artistData }) => {
           <div className="text-2xl md:text-3xl text-[#ff4545] dark:text-white mb-2">
             <Icon lib="fa-solid" name="fa-music" />
           </div>
-          <div className="text-xl md:text-2xl font-bold text-black dark:text-white">
+          <div className="text-xl font-bold text-black md:text-2xl dark:text-white">
             {stats.tracksCount}
           </div>
-          <div className="text-gray-500 dark:text-gray-300 text-xs md:text-sm text-center">
+          <div className="text-xs text-center text-gray-500 dark:text-gray-300 md:text-sm">
             Titres publiés
           </div>
         </div>
       </div>
 
       {/* Onglets */}
-      <div className="flex flex-wrap gap-2 justify-center mt-6 md:mt-10 mb-4 md:mb-6 px-4">
+      <div className="flex flex-wrap justify-center gap-2 px-4 mt-6 mb-4 md:mt-10 md:mb-6">
         <button
           className={`px-3 md:px-6 py-2 rounded-full font-semibold flex items-center gap-2 transition-all duration-300 text-sm md:text-base ${
             activeTab === "overview"
@@ -490,10 +490,10 @@ const ArtistDashboard = ({ artistData }) => {
       </div>
 
       {/* Contenu des onglets */}
-      <div className="max-w-5xl mx-auto bg-black/5 dark:bg-white/10 backdrop-blur-xl border border-black/10 dark:border-white/20 rounded-2xl p-4 md:p-6 shadow-xl mx-4">
+      <div className="max-w-5xl p-4 mx-4 mx-auto border shadow-xl bg-black/5 dark:bg-white/10 backdrop-blur-xl border-black/10 dark:border-white/20 rounded-2xl md:p-6">
         {activeTab === "overview" && (
           <div>
-            <h3 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-4 md:mb-6">
+            <h3 className="mb-4 text-xl font-bold text-black md:text-2xl dark:text-white md:mb-6">
               Vue d'ensemble
             </h3>
             <div
@@ -516,10 +516,10 @@ const ArtistDashboard = ({ artistData }) => {
                         alt={album.name}
                         width={40}
                         height={40}
-                        className="rounded-lg object-cover"
+                        className="object-cover rounded-lg"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="font-bold text-black dark:text-white text-sm md:text-base truncate">
+                        <div className="text-sm font-bold text-black truncate dark:text-white md:text-base">
                           {album.name}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-300">
@@ -548,10 +548,10 @@ const ArtistDashboard = ({ artistData }) => {
                         alt={track.name}
                         width={40}
                         height={40}
-                        className="rounded object-cover"
+                        className="object-cover rounded"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="font-bold text-black dark:text-white text-sm md:text-base truncate">
+                        <div className="text-sm font-bold text-black truncate dark:text-white md:text-base">
                           {track.name}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-300">
@@ -570,7 +570,7 @@ const ArtistDashboard = ({ artistData }) => {
         )}
         {activeTab === "albums" && (
           <div>
-            <h3 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-4 md:mb-6">
+            <h3 className="mb-4 text-xl font-bold text-black md:text-2xl dark:text-white md:mb-6">
               Albums
             </h3>
             <div
@@ -588,10 +588,10 @@ const ArtistDashboard = ({ artistData }) => {
                     alt={album.name}
                     width={48}
                     height={48}
-                    className="rounded-lg object-cover flex-shrink-0"
+                    className="flex-shrink-0 object-cover rounded-lg"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-black dark:text-white text-base md:text-lg truncate">
+                    <div className="text-base font-bold text-black truncate dark:text-white md:text-lg">
                       {album.name}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-300">
@@ -608,7 +608,7 @@ const ArtistDashboard = ({ artistData }) => {
         )}
         {activeTab === "tracks" && (
           <div>
-            <h3 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-4 md:mb-6">
+            <h3 className="mb-4 text-xl font-bold text-black md:text-2xl dark:text-white md:mb-6">
               Titres
             </h3>
             <div
@@ -626,10 +626,10 @@ const ArtistDashboard = ({ artistData }) => {
                     alt={track.name}
                     width={40}
                     height={40}
-                    className="rounded object-cover flex-shrink-0"
+                    className="flex-shrink-0 object-cover rounded"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="font-bold text-black dark:text-white text-base md:text-lg truncate">
+                    <div className="text-base font-bold text-black truncate dark:text-white md:text-lg">
                       {track.name}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-300">
@@ -646,7 +646,7 @@ const ArtistDashboard = ({ artistData }) => {
         )}
         {activeTab === "analytics" && (
           <div>
-            <h3 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-4 md:mb-6">
+            <h3 className="mb-4 text-xl font-bold text-black md:text-2xl dark:text-white md:mb-6">
               Analytics
             </h3>
             <div
@@ -659,7 +659,7 @@ const ArtistDashboard = ({ artistData }) => {
                   <Icon lib="fa-solid" name="fa-arrow-trend-up" /> Croissance
                   hebdo
                 </div>
-                <div className="text-2xl md:text-3xl font-bold text-black dark:text-white">
+                <div className="text-2xl font-bold text-black md:text-3xl dark:text-white">
                   +{analytics.weeklyGrowth}%
                 </div>
               </div>
@@ -669,8 +669,8 @@ const ArtistDashboard = ({ artistData }) => {
                 </div>
                 <ul className="space-y-2">
                   {analytics.topCountries.map((item, idx) => (
-                    <li key={idx} className="flex justify-between items-center">
-                      <span className="text-black dark:text-white text-sm">
+                    <li key={idx} className="flex items-center justify-between">
+                      <span className="text-sm text-black dark:text-white">
                         {item.country}
                       </span>
                       <span className="text-[#ff4545] dark:text-white font-bold text-sm">
@@ -686,8 +686,8 @@ const ArtistDashboard = ({ artistData }) => {
                 </div>
                 <ul className="space-y-2">
                   {analytics.ageGroups.map((item, idx) => (
-                    <li key={idx} className="flex justify-between items-center">
-                      <span className="text-black dark:text-white text-sm">
+                    <li key={idx} className="flex items-center justify-between">
+                      <span className="text-sm text-black dark:text-white">
                         {item.group}
                       </span>
                       <span className="text-[#ff4545] dark:text-white font-bold text-sm">
@@ -704,12 +704,12 @@ const ArtistDashboard = ({ artistData }) => {
 
       {/* Modales d'upload (optionnel) */}
       {showBannerUpload && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-[#232323] rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold text-black dark:text-white mb-4">
+            <h3 className="mb-4 text-xl font-bold text-black dark:text-white">
               Changer la photo de banner
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <p className="mb-4 text-gray-600 dark:text-gray-300">
               Sélectionnez une nouvelle image pour votre banner
             </p>
             <div className="flex gap-3">
@@ -721,7 +721,7 @@ const ArtistDashboard = ({ artistData }) => {
               </button>
               <button
                 onClick={() => setShowBannerUpload(false)}
-                className="flex-1 bg-gray-300 dark:bg-gray-600 text-black dark:text-white px-4 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                className="flex-1 px-4 py-2 text-black transition-colors bg-gray-300 rounded-lg dark:bg-gray-600 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
               >
                 Annuler
               </button>
@@ -731,12 +731,12 @@ const ArtistDashboard = ({ artistData }) => {
       )}
 
       {showProfileUpload && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-[#232323] rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold text-black dark:text-white mb-4">
+            <h3 className="mb-4 text-xl font-bold text-black dark:text-white">
               Changer la photo de profil
             </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">
+            <p className="mb-4 text-gray-600 dark:text-gray-300">
               Sélectionnez une nouvelle image pour votre profil
             </p>
             <div className="flex gap-3">
@@ -748,7 +748,7 @@ const ArtistDashboard = ({ artistData }) => {
               </button>
               <button
                 onClick={() => setShowProfileUpload(false)}
-                className="flex-1 bg-gray-300 dark:bg-gray-600 text-black dark:text-white px-4 py-2 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                className="flex-1 px-4 py-2 text-black transition-colors bg-gray-300 rounded-lg dark:bg-gray-600 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
               >
                 Annuler
               </button>
@@ -759,7 +759,7 @@ const ArtistDashboard = ({ artistData }) => {
 
       {/* Modal Upload Projet */}
       {showUploadModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-[#232323] rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-bold text-black dark:text-white">
@@ -776,7 +776,7 @@ const ArtistDashboard = ({ artistData }) => {
             <form onSubmit={handleSubmitProject} className="space-y-6">
               {/* Titre du projet */}
               <div>
-                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                <label className="block mb-2 text-sm font-medium text-black dark:text-white">
                   Titre du projet *
                 </label>
                 <input
@@ -791,7 +791,7 @@ const ArtistDashboard = ({ artistData }) => {
 
               {/* Type de projet */}
               <div>
-                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                <label className="block mb-2 text-sm font-medium text-black dark:text-white">
                   Type de projet *
                 </label>
                 <select
@@ -811,7 +811,7 @@ const ArtistDashboard = ({ artistData }) => {
 
               {/* Collaborateurs */}
               <div>
-                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                <label className="block mb-2 text-sm font-medium text-black dark:text-white">
                   Artistes en collaboration
                 </label>
                 <input
@@ -827,7 +827,7 @@ const ArtistDashboard = ({ artistData }) => {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                <label className="block mb-2 text-sm font-medium text-black dark:text-white">
                   Description
                 </label>
                 <textarea
@@ -843,7 +843,7 @@ const ArtistDashboard = ({ artistData }) => {
 
               {/* Upload Audio */}
               <div>
-                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                <label className="block mb-2 text-sm font-medium text-black dark:text-white">
                   Fichier Audio *
                 </label>
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-[#ff4545] transition-colors">
@@ -859,21 +859,21 @@ const ArtistDashboard = ({ artistData }) => {
                     <Icon
                       lib="fa-solid"
                       name="fa-music"
-                      className="text-4xl text-gray-400 mb-2"
+                      className="mb-2 text-4xl text-gray-400"
                     />
                     <p className="text-gray-600 dark:text-gray-400">
                       {uploadForm.audioFile
                         ? uploadForm.audioFile.name
                         : "Cliquez pour sélectionner un fichier audio"}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
                       MP3, WAV, FLAC (max 50MB)
                     </p>
                   </label>
                 </div>
                 {uploadForm.audioPreview && (
-                  <div className="mt-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <p className="text-green-700 dark:text-green-300 text-sm">
+                  <div className="p-3 mt-2 rounded-lg bg-green-50 dark:bg-green-900/20">
+                    <p className="text-sm text-green-700 dark:text-green-300">
                       ✓ Fichier audio sélectionné
                     </p>
                   </div>
@@ -882,7 +882,7 @@ const ArtistDashboard = ({ artistData }) => {
 
               {/* Upload Image */}
               <div>
-                <label className="block text-sm font-medium text-black dark:text-white mb-2">
+                <label className="block mb-2 text-sm font-medium text-black dark:text-white">
                   Image du projet
                 </label>
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-[#ff4545] transition-colors">
@@ -897,24 +897,24 @@ const ArtistDashboard = ({ artistData }) => {
                     <Icon
                       lib="fa-solid"
                       name="fa-image"
-                      className="text-4xl text-gray-400 mb-2"
+                      className="mb-2 text-4xl text-gray-400"
                     />
                     <p className="text-gray-600 dark:text-gray-400">
                       {uploadForm.imageFile
                         ? uploadForm.imageFile.name
                         : "Cliquez pour sélectionner une image"}
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
                       JPG, PNG, GIF (max 5MB)
                     </p>
                   </label>
                 </div>
                 {uploadForm.imagePreview && (
                   <div className="mt-2">
-                    <img
+                    <Image
                       src={uploadForm.imagePreview}
                       alt="Aperçu"
-                      className="w-20 h-20 object-cover rounded-lg"
+                      className="object-cover w-20 h-20 rounded-lg"
                     />
                   </div>
                 )}
@@ -946,7 +946,7 @@ const ArtistDashboard = ({ artistData }) => {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 bg-gray-300 dark:bg-gray-600 text-black dark:text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
+                  className="flex-1 px-6 py-3 font-semibold text-black transition-colors bg-gray-300 rounded-lg dark:bg-gray-600 dark:text-white hover:bg-gray-400 dark:hover:bg-gray-500"
                 >
                   Annuler
                 </button>

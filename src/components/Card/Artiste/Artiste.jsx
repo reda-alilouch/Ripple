@@ -5,9 +5,9 @@ const Artiste = ({ artist, className = "" }) => {
   return (
     <div className={`card-artistes ${className}`}>
       <a href="#">
-        <div className="artistes w-28 h-32">
-          <img
-            className="img-artistes w-full h-28 rounded-full object-cover"
+        <div className="h-32 artistes w-28">
+          <Image
+            className="object-cover w-full rounded-full img-artistes h-28"
             src={artist.image || "/default-artist.svg"}
             alt={`Photo de ${artist.name}`}
             onError={(e) => {
@@ -15,7 +15,7 @@ const Artiste = ({ artist, className = "" }) => {
               e.target.src = "/default-artist.svg";
             }}
           />
-          <h3 className="h3-artistes text-center">{artist.name}</h3>
+          <h3 className="text-center h3-artistes">{artist.name}</h3>
         </div>
       </a>
     </div>

@@ -5,7 +5,7 @@ import Button from "@/components/Button";
 import Modal from "@/components/Modal/Modal";
 import Link from "next/link";
 import axios from "axios";
-
+import Image from "next/image"
 export default function Connexion() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session, status } = useSession();
@@ -62,27 +62,27 @@ export default function Connexion() {
 
   if (status === "loading") {
     return (
-      <div className="w-10 h-10 rounded-full animate-pulse bg-gray-200 dark:bg-gray-700" />
+      <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse dark:bg-gray-700" />
     );
   }
 
   return (
-    <div className="connexion relative">
+    <div className="relative connexion">
       {status === "authenticated" && session?.user ? (
         <div className="profile-dropdown">
           <button
             onClick={toggleDropdown}
             className="flex items-center focus:outline-none"
           >
-            <img
+            <Image
               src={session.user.image || "/default-artist.svg"}
               alt="Profile"
-              className="w-10 h-10 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+              className="object-cover w-10 h-10 transition-opacity rounded-full cursor-pointer hover:opacity-80"
             />
           </button>
 
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
+            <div className="absolute right-0 z-50 w-48 py-1 mt-2 bg-white rounded-md shadow-lg dark:bg-gray-800">
               <Link
                 href="/profil"
                 className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -93,7 +93,7 @@ export default function Connexion() {
 
               <button
                 onClick={handleSignOut}
-                className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="block w-full px-4 py-2 text-sm text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 Se déconnecter
               </button>

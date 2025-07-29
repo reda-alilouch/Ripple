@@ -7,7 +7,7 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   color: white;
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
   margin: 0 auto;
 }
 
@@ -24,7 +24,7 @@
   overflow: hidden;
 }
 
-.playlistImage img {
+.playlistImage .image-playlist {
   position: absolute;
   top: 0;
   left: 0;
@@ -40,7 +40,7 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #1DB954;
+  background: #1db954;
   border: none;
   color: white;
   font-size: 20px;
@@ -116,7 +116,7 @@
   .playlistCard {
     max-width: 100%;
   }
-  
+
   .playlistDescription {
     -webkit-line-clamp: 1;
   }
