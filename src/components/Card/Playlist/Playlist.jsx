@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import Image from "next/image";
 
 const Playlist = ({ playlist, className = "" }) => {
   // Sécurité : fallback si playlist absent
@@ -9,10 +10,10 @@ const Playlist = ({ playlist, className = "" }) => {
       className={`group relative w-full max-w-[200px] rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 cursor-pointer aspect-square ${className}`}
     >
       {/* Image principale */}
-      <img
+      <Image
         src={playlist.image || "/default-playlist.svg"}
         alt={`Pochette de ${playlist.name}`}
-        className="w-full h-full object-cover rounded-md"
+        className="w-full h-full rounded-md objec-cover image-playlist"
         onError={(e) => {
           e.target.onerror = null;
           e.target.src = "/default-playlist.svg";
@@ -22,11 +23,11 @@ const Playlist = ({ playlist, className = "" }) => {
       {/* Overlay flou en bas */}
       <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/80 to-transparent backdrop-blur-sm">
         <div className="absolute bottom-0 left-0 right-0 p-3">
-          <h3 className="text-white font-bold text-lg truncate mb-1">
+          <h3 className="mb-1 text-lg font-bold text-white truncate">
             {playlist.name}
           </h3>
 
-          <div className="flex items-center justify-between text-white text-sm">
+          <div className="flex items-center justify-between text-sm text-white">
             <span className="font-medium">titres</span>
             {/* Ajoute d'autres infos si besoin */}
           </div>
@@ -35,7 +36,7 @@ const Playlist = ({ playlist, className = "" }) => {
 
       {/* Bouton play */}
       <button className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-[#ff4545] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 hover:bg-[#ff3030] shadow-lg z-20">
-        <span className="text-white text-xl">▶</span>
+        <span className="text-xl text-white">▶</span>
       </button>
     </div>
   );

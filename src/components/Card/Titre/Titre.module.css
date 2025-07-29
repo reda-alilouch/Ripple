@@ -9,7 +9,7 @@
     align-items: center;
   }
 
-  img {
+   .img-titre {
     object-fit: cover;
   }
   .icon-time {

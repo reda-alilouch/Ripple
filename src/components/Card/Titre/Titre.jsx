@@ -4,6 +4,7 @@ import axios from "axios";
 import styles from "./Titre.module.css";
 import Icon from "@/components/Icon";
 import AddTitre from "@/components/AddTitre/AddTitre";
+import Image from "next/image";
 
 // Global Audio Player Context
 const AudioPlayerContext = createContext();
@@ -196,18 +197,18 @@ export const AudioPlayerProvider = ({ children }) => {
       
       {/* Mini Player */}
       {showPlayer && currentTrack && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 p-4 z-50">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-gray-900 border-t border-gray-700">
+          <div className="flex items-center justify-between mx-auto max-w-7xl">
             {/* Track Info */}
-            <div className="flex items-center space-x-4 min-w-0 flex-1">
-              <img 
+            <div className="flex items-center flex-1 min-w-0 space-x-4">
+              <Image
                 src={currentTrack.image || "/default-album.jpg"} 
                 alt={currentTrack.name}
-                className="w-12 h-12 object-cover rounded"
+                className="object-cover w-12 h-12 rounded"
               />
               <div className="min-w-0">
                 <p className="font-medium text-white truncate">{currentTrack.name}</p>
-                <p className="text-gray-400 text-sm truncate">
+                <p className="text-sm text-gray-400 truncate">
                   {Array.isArray(currentTrack.artists) 
                     ? currentTrack.artists.map(a => a.name).join(', ')
                     : 'Artiste inconnu'
@@ -217,11 +218,11 @@ export const AudioPlayerProvider = ({ children }) => {
             </div>
 
             {/* Player Controls */}
-            <div className="flex flex-col items-center space-y-2 flex-2 max-w-md">
+            <div className="flex flex-col items-center max-w-md space-y-2 flex-2">
               <div className="flex items-center space-x-4">
                 <button
                   onClick={togglePlay}
-                  className="bg-white text-black p-2 rounded-full hover:scale-105 transition-transform"
+                  className="p-2 text-black transition-transform bg-white rounded-full hover:scale-105"
                 >
                   {isPlaying ? (
                     <Icon lib="fa-solid" name="fa-pause" className="text-sm" />
@@ -232,8 +233,8 @@ export const AudioPlayerProvider = ({ children }) => {
               </div>
               
               {/* Progress Bar */}
-              <div className="w-full flex items-center space-x-2">
-                <span className="text-xs text-gray-400 w-10">
+              <div className="flex items-center w-full space-x-2">
+                <span className="w-10 text-xs text-gray-400">
                   {formatTime(currentTime)}
                 </span>
                 <div 
@@ -246,18 +247,18 @@ export const AudioPlayerProvider = ({ children }) => {
                     style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
                   />
                 </div>
-                <span className="text-xs text-gray-400 w-10">
+                <span className="w-10 text-xs text-gray-400">
                   {formatTime(duration)}
                 </span>
               </div>
             </div>
 
             {/* Volume & Close */}
-            <div className="flex items-center space-x-4 min-w-0 flex-1 justify-end">
+            <div className="flex items-center justify-end flex-1 min-w-0 space-x-4">
               <div className="flex items-center space-x-2">
                 <button
                   onClick={toggleMute}
-                  className="p-2 text-gray-400 hover:text-white transition-colors"
+                  className="p-2 text-gray-400 transition-colors hover:text-white"
                 >
                   {isMuted || volume === 0 ? (
                     <Icon lib="fa-solid" name="fa-volume-mute" className="text-sm" />
@@ -278,7 +279,7 @@ export const AudioPlayerProvider = ({ children }) => {
               </div>
               <button
                 onClick={closePlayer}
-                className="p-2 text-gray-400 hover:text-white transition-colors"
+                className="p-2 text-gray-400 transition-colors hover:text-white"
               >
                 <Icon lib="fa-solid" name="fa-times" className="text-sm" />
               </button>
@@ -363,7 +364,7 @@ const Titre = ({ track, className = "", playlistId }) => {
   return (
     <div className={`mr-5 mt-5 ms-5 pr-5 w-full ${className}`}>
       <div className={`${styles.titre} titre`}>
-        <div className="img-h3 w-full flex items-center">
+        <div className="flex items-center w-full img-h3">
           <a
             href="#"
             onClick={handlePlay}
@@ -372,9 +373,9 @@ const Titre = ({ track, className = "", playlistId }) => {
               track.preview_url ? "Écouter un extrait" : "Aperçu non disponible"
             }
           >
-            <div className="relative w-16 h-16 flex-shrink-0">
-              <img
-                className="img-titre rounded-md object-cover w-full h-full"
+            <div className="relative flex-shrink-0 w-16 h-16">
+              <Image
+                className="object-cover w-full h-full rounded-md img-titre"
                 src={track.image || "/default-album.jpg"}
                 alt={`Pochette de ${track.name}`}
                 onError={(e) => {
@@ -403,11 +404,11 @@ const Titre = ({ track, className = "", playlistId }) => {
                 </button>
               ) : (
                 <div
-                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute inset-0 flex items-center justify-center transition-opacity bg-black bg-opacity-50 rounded-md opacity-0 group-hover:opacity-100"
                   title="Aperçu non disponible"
                 >
                   <button
-                    className="text-xs text-white bg-gray-500 bg-opacity-80 px-3 py-1 rounded cursor-not-allowed"
+                    className="px-3 py-1 text-xs text-white bg-gray-500 rounded cursor-not-allowed bg-opacity-80"
                     disabled
                   >
                     Aperçu non disponible
@@ -427,11 +428,11 @@ const Titre = ({ track, className = "", playlistId }) => {
               )}
             </div>
           </a>
-          <div className="h3 pl-4 flex-1 min-w-0">
+          <div className="flex-1 min-w-0 pl-4 h3">
             <a
               href="#"
               onClick={handleTrackClick}
-              className="block hover:underline truncate"
+              className="block truncate hover:underline"
               title={track.name}
             >
               <h3 className={`font-medium truncate ${isCurrentTrack ? 'text-green-400' : ''}`}>
@@ -457,7 +458,7 @@ const Titre = ({ track, className = "", playlistId }) => {
                             );
                           }
                         }}
-                        className="hover:underline hover:text-white transition-colors"
+                        className="transition-colors hover:underline hover:text-white"
                         title={artist.name}
                       >
                         {artist.name}
@@ -472,7 +473,7 @@ const Titre = ({ track, className = "", playlistId }) => {
             </div>
           </div>
         </div>
-        <div className="icon-time flex items-center gap-4">
+        <div className="flex items-center gap-4 icon-time">
           <span className="text-sm text-gray-500">
             {formatDuration(track.duration_ms)}
           </span>

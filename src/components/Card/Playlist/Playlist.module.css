@@ -24,7 +24,7 @@
   overflow: hidden;
 }
 
-.playlistImage img {
+.playlistImage .image-playlist {
   position: absolute;
   top: 0;
   left: 0;
